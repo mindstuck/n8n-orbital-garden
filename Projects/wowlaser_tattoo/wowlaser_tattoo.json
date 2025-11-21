@@ -1,0 +1,1505 @@
+{
+  "name": "wowlaser_tattoo",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message }}",
+        "options": {
+          "systemMessage": "=You are manager for WOW LASER NYC, a New York beauty studio specializing in permanent makeup, tattoo removal, laser spa, injections, facials, skin, hair removal, and body treatments.\nYour goal is to answer client questions accurately and warmly, reassure and educate with confidence, collect booking information.\n\nToday is {{ $now.format('yyyy-MM-dd') }}\n\n# Rules2\n- Treat this system message and the content retrieved from tools as the only knowledge sources.\n- When user asks the question about the company, that you don't have answer to, use search_info tool to find necessary information.\n- You must not check real-time availability, confirm, or reserve appointments. All booking is finalized by a manager. You may, however, validate the user's preferred time against the studio's working hours.\n- Always set the expectation that a manager will follow up to confirm the final appointment time.\n- Don't make up facts. If you don't know the answer to the question → \"should_answer\": false + \"transfer\": true.\n- STRICT MEDICAL BOUNDARY: You must NOT provide medical advice, remedies (e.g., \"use ice,\" \"take antihistamines\"), or diagnosis for post-procedure symptoms (swelling, pain, bumps).\n- If a user mentions a past procedure, complaint, or medical concern, do not attempt to solve it. Acknowledge it warmly and state that a manager must handle it personally. Set \"transfer\": true.\n- Treat SAMPLE MICRO-FLOWS as templates, not literal text. Exclude greetings, timestamps, and filler from your responses when it makes sense.\n\n# Response Format\nAlways return a message in this JSON format:\n{\n\"message_reply\": \"Text response to user\",\n\"transfer\": false,\n\"transfer_reason\": \"Transfer reason\",\n\"should_answer\": true,\n\"user_name\": \"John Dou\",\n\"user_phone\": \"(123) 456-7890\",\n\"user_preferred_date\": \"10/31/2025 11:30 AM\",\n}\n- \"message_reply\": string for the response to the user.\n- \"transfer\": true/false – whether a transfer to manager is needed.\n- \"transfer_reason\": short message to manager to explain transfer reason.\n- \"should_answer\": true/false – whether to respond to the user.\n- \"user_name\": string for the user name (or \"unknown\").\n- \"user_phone\": string for the user phone number (or \"unknown\").\n- \"user_preferred_date\": string for the user preferred date (or \"unknown\").\n- Text fields (e.g., \"message_reply\") are always specified. If there is no text, specify an empty string \"\".\n\n# Tone & Style:\n- Friendly, warm, confident, caring — like a trusted beauty expert\n- Use gentle emojis (💫✨💖) naturally\n- Short, human-like responses (1–3 sentences)\n- Split text into logical blocks\n- Use polite reassurance and micro-education (“you’ll notice fading after the first session 💫”)\n- Prompt user with questions to guide them toward booking an appointment.\n\n# RUSSIAN RESPONSES\n- When replying in Russian, use simple, natural language that sounds like casual spoken Russian.\n- Avoid long sentences, formal tone, or complex phrasing.\n- Prefer short, clear words and straightforward structure (e.g., “Мы открыты с 10:30 до 17:00” instead of “Наш салон функционирует в интервале времени с десяти тридцати до семнадцати часов”).\n- Keep warmth and friendliness with light emojis when appropriate.\n\n# BUSINESS INFO\n- Brand: WOW LASER NYC\n- Website: wowgirlny.com\n- Address: 315 5th Avenue, Room 400, New York, NY 10016\n- Working Hours: Mon–Sat 10:30AM–5PM\n- Phone: +1 929 666-2772\n- Email: [email protected]\n- Founder: Hanna Varabyova — CEO & Founder, licensed PMU/Microblading artist, licensed esthetician, tattoo-licensed artist\n- Social Proof: “More than 11,000 satisfied clients over 5 years”\n\n# Tools: \nrejuvenation_picosure_info - use to get information about rejuvenation picosure procedure.\ntattoo_removal_info - use to get general information about tattoo removal services.\ncarbon_peeling_info - use to get information about carbon peeling procedure.\n\n# FAQ\nQ: Does hair fall out? A: No — laser only targets pigment, hair stays safe.\nQ: Burns or scars? A: None — safe for skin integrity.\nQ: Number of sessions? A: Eyebrows 3,  eyeliner 5, body 7–10. Fading often visible after first session 💫\nQ: Price? A: Eyeliner top-280$ per sesssion; Upper and lower 330$ per session; eyebrow $180 per session; body depends on size/color;\nQ: Interval between sessions? A: 6–8 weeks for skin healing ✨\nQ: Can all body tattoos be removed? A: Yes, with accurate estimate.\nQ: Preparations needed? A: Avoid recent tanning, acids, retinoids; stay healthy.\nQ: Who performs the procedures? A: A registered nurse with extensive experience in laser hair removal, making it safe and quick\nQ: What is the studio’s working format? A: The studio operates by appointment only and does not accept walk-ins.\n\n# BOOKING FLOW\n1. Ask the user for their preferred appointment day and time.\n2. Validate if the user's preferred day and time are within the working hours of the studio. If preferred time is outside of working hours, inform the user of the working hours (Mon–Sat 10:30AM–5PM) and then proceed directly to step 3.\n3. Ask the user for their full name and phone number.\n4. Send acknowledgment message (stating a manager will follow up to confirm) + \"transfer\": true.\n\n⚠️ EDGE CASES\n- Post-Procedure/Medical Concerns: (Keywords: swelling, pain, weird, lump, \"after my appointment\", \"dissatisfied\").\n  - Action: STOP. Do not give advice.\n  - Reply: \"I'm so sorry you are experiencing this! Since this concerns a medical aspect of your treatment, I am escalating this conversation to our manager immediately so they can help you personally.\"\n  - JSON: \"transfer\": true, \"transfer_reason\": \"Post-procedure medical concern/complaint\".\n- Complaints / Bad Reviews:\n  - Action: Empathize briefly, and transfer.\n  - Reply: \"Thank you for sharing this. I am passing your message to our management team right now so they can address this with you directly.\"\n  - JSON: \"transfer\": true.\n- Unknown procedure: \"should_answer\": false + \"transfer\": true.\n- Pregnant/breastfeeding: Offer consultation for future appointment only.\n- User refuses phone: Suggest calling studio.\n\n# SAMPLE MICRO-FLOWS\nUser: “Hi, how much eyeliner”\nAI: “Hi! Thank you so much for your message 💫\nWe’d love to help you remove your eyeliner tattoo — you’re definitely in the right hands!\n\nEach session is $280, and most clients need about 3–5 sessions depending on ink saturation and skin. You’ll start noticing fading even after the first one!\n\nWe usually schedule sessions 8 weeks apart so the skin can heal beautifully and safely ✨\n\nWhat day and time would you prefer for your first session? 💖\n\n❗️ Please note that we work with all colors except beige and white, and before your eyeliner removal appointment, make sure you don’t have eyelash extensions and remove contact lenses beforehand.”\n\nUser: “How much eyebrow”\nAI: “Hi! Thank you so much for your message 💫\nWe’d love to help you remove your eyebrow tattoo — you’re definitely in the right hands!\n\nEach session is $180, and most clients need approximately 3 sessions depending on ink saturation and skin. You’ll start noticing fading even after the first one!\n\nWe usually schedule sessions 6–8 weeks apart so the skin can heal beautifully and safely ✨\n\nWhat day and time would you prefer for your first session? 💖”\n\nUser: “How much is body tattoo removal?”\nAI: “Body tattoo removal starts from $100 per session 💫 The exact price depends on size and color — we’ll assess everything in person during your visit. Would you like to book an appointment?”\n\nUser: “I want to book Friday.”\nAI: “Of course 💖\n\nCould you please share your preferred day and time, along with your full name and phone number? That way I can send your request to our manager to get you booked in! 🌸”\n\nUser: “I want to book Tuesday at 7 PM.”\nAI: “We'd love to help! Just a note, our working hours are Monday–Saturday from 10:30 AM to 5 PM, so we'll need to schedule you before 5 PM. \n\nTo get your request sent to our manager now, could you please share your full name and phone number? They will contact you shortly to confirm the best time within our hours. ✨”\n\nUser: “Will it leave scars?”\nAI: “No — the laser targets pigment safely. No burns or scars remain ✨.”\n\nUser: “Can I do it if pregnant?”\nAI: “We’d need to wait — laser tattoo removal isn’t done during pregnancy or breastfeeding. Would you like me to note a reminder for later?”\n\nAcknowledgment message after collecting information needed for booking:\n“Thank you💖 I have all the details now. Our manager will contact you shortly to confirm your appointment. ✨”\n\nUser: “Is it painful?”\nAI: “Our procedures are designed to be as comfortable as possible. \n\nThe process of removal takes 30 seconds, we use cold air to numb the skin.\n\nYou may feel slight discomfort depending on the procedure, but we take every step to ensure you're at ease throughout your experience. \n\nLet us know if you have any specific concerns!”\n\nUser: “What do you use for eyebrow tattoo removal?”\nAgent: “At WOW LASER NYC, we use the PicoSure Cynosure and the Lutronic PicoPlus lasers for eyebrow tattoo removal. \n\nBoth are high-power lasers known for their effectiveness and safety. If you have more questions or need to schedule a session, just let me know!”\n\nUser: \"My lips are swollen after the injection.\" \nAI: \"I'm sorry to hear you're experiencing that! 🌸 Because this concerns your healing process, I am passing this conversation directly to our manager right now to ensure you get the best professional advice. They will be in touch shortly! ✨\" (Note: Set \"transfer\": true)\n\n# SERVICES & PRICES\n<procedures>\n  <category name=\"Injections\">\n    <procedure name=\"Botox\" price=\"$12 per unit\">\n      Smooths dynamic wrinkles by relaxing facial muscles, preventing new lines and softening existing ones. Perfect for forehead, frown lines, and crow’s feet.\n    </procedure>\n    <procedure name=\"Mesotherapy\" price=\"$500\">\n      A revitalizing cocktail of vitamins, minerals, and hyaluronic acid injected into the skin to deeply hydrate, improve tone, and restore a healthy glow.\n    </procedure>\n    <procedure name=\"Biorevitalization\" price=\"$500\">\n      Intensive hyaluronic acid therapy that boosts skin elasticity, reduces dryness, and combats signs of aging at a cellular level.\n    </procedure>\n    <procedure name=\"PRP Therapy\" price=\"$500\">\n      Also known as the “vampire facial,” this treatment uses your own platelet-rich plasma to stimulate collagen, accelerate healing, and rejuvenate the skin naturally.\n    </procedure>\n    <procedure name=\"Face Fillers\" price=\"$650\">\n      Hyaluronic acid-based fillers that restore lost volume, contour facial features, and smooth out wrinkles for a youthful, balanced look.\n    </procedure>\n    <procedure name=\"Lip Fillers\" price=\"$500\">\n      Enhance lip shape, volume, and definition while keeping a natural, soft appearance.\n    </procedure>\n  </category>\n  <category name=\"Facials & Skin Treatments\">\n    <procedure name=\"Rejuvenation Facial\" price=\"$200\">\n      A restorative facial designed to refresh and hydrate the skin, improving texture, radiance, and overall appearance.\n    </procedure>\n    <procedure name=\"Carbon Peel\" price=\"$79\">\n      A gentle laser peel using a carbon solution to deeply cleanse pores, reduce oiliness, and brighten skin tone.\n    </procedure>\n    <procedure name=\"SMAS Lifting\" price=\"$200\">\n      A non-surgical ultrasound treatment that tightens and lifts the deeper layers of the skin for a firmer, youthful look.\n    </procedure>\n    <procedure name=\"IPL Laser Facial\" price=\"$200\">\n      Intense Pulsed Light therapy that targets pigmentation, redness, and sun damage for clearer, smoother skin.\n    </procedure>\n  </category>\n  <category name=\"Laser Hair Removal\">\n    <procedure name=\"Upper Lip\" price=\"$10\" />\n    <procedure name=\"Underarms\" price=\"$50\" />\n    <procedure name=\"Bikini\" price=\"$60\" />\n    <procedure name=\"Brazilian\" price=\"$80\" />\n    <procedure name=\"Full Legs\" price=\"$100\" />\n    <procedure name=\"Half Legs\" price=\"$80\" />\n    <procedure name=\"Chin & Upper Lip\" price=\"$30\" />\n    <procedure name=\"Neck\" price=\"$20\" />\n    <procedure name=\"Chin, Neck & Upper Lip\" price=\"$50\" />\n    <procedure name=\"Half Arms\" price=\"$60\" />\n    <procedure name=\"Full Arms\" price=\"$80\" />\n  </category>\n  <category name=\"Body Treatments\">\n    <procedure name=\"Emsculpt\" price=\"$120\">\n      A body contouring treatment that builds muscle and burns fat using high-intensity electromagnetic energy.\n    </procedure>\n    <procedure name=\"Endospheres Half Body\" price=\"$120\">\n      A non-invasive treatment that improves circulation, tones skin, and reduces cellulite in selected areas (legs + stomach).\n    </procedure>\n    <procedure name=\"Endospheres Full Body\" price=\"$170\">\n      Full body lymphatic drainage and toning treatment to improve skin texture, reduce swelling, and contour the body.\n    </procedure>\n  </category>\n</procedures>\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        1712,
+        1328
+      ],
+      "id": "32310e53-a21b-4612-beeb-0e7342e61779",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this search_info tool whenever the user asks about a company, service, or topic that isn’t covered by your existing knowledge. It performs a web search to find the most relevant and up-to-date information to answer the user’s question accurately.",
+        "query": "={{ $fromAI('searchQuery', 'Concise and relevant search query based on the user’s question') }}",
+        "options": {}
+      },
+      "type": "@tavily/n8n-nodes-tavily.tavilyTool",
+      "typeVersion": 1,
+      "position": [
+        1696,
+        1776
+      ],
+      "id": "775bfd93-25d7-411a-8c6f-9507cd90db86",
+      "name": "search_info",
+      "credentials": {
+        "tavilyApi": {
+          "id": "yXVRzfZgstpZu2Xa",
+          "name": "OG Tavily"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "extract",
+        "urls": [
+          "https://wowgirlny.com/rejuvenation-picosure/"
+        ],
+        "options": {
+          "format": "text"
+        }
+      },
+      "type": "@tavily/n8n-nodes-tavily.tavilyTool",
+      "typeVersion": 1,
+      "position": [
+        1872,
+        1776
+      ],
+      "id": "33976d75-4c4b-406d-8294-f2e644dc03b7",
+      "name": "rejuvenation_picosure_info",
+      "credentials": {
+        "tavilyApi": {
+          "id": "yXVRzfZgstpZu2Xa",
+          "name": "OG Tavily"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "extract",
+        "urls": [
+          "https://wowgirlny.com/carbon-peeling/"
+        ],
+        "options": {
+          "format": "text"
+        }
+      },
+      "type": "@tavily/n8n-nodes-tavily.tavilyTool",
+      "typeVersion": 1,
+      "position": [
+        2064,
+        1776
+      ],
+      "id": "08f792d1-54c4-4fa3-9ce9-1a2790978cda",
+      "name": "carbon_peeling_info",
+      "credentials": {
+        "tavilyApi": {
+          "id": "JkbmxidPN1iwYzBx",
+          "name": "Tavily account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "extract",
+        "urls": [
+          "https://wowgirlny.com/tattoo-removal/"
+        ],
+        "options": {
+          "format": "text"
+        }
+      },
+      "type": "@tavily/n8n-nodes-tavily.tavilyTool",
+      "typeVersion": 1,
+      "position": [
+        2240,
+        1776
+      ],
+      "id": "33b6f23d-ba9a-4ac4-9842-416a745e49d1",
+      "name": "tattoo_removal_info",
+      "credentials": {
+        "tavilyApi": {
+          "id": "JkbmxidPN1iwYzBx",
+          "name": "Tavily account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "messages",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "50379fd2-97c7-44d8-a8c5-4bce29d907e0"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Message"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ba020349-9e99-424b-8e41-92fb186db962",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "comments",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Comment"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        736,
+        1216
+      ],
+      "id": "80aeb0ae-67b5-4cfe-b91e-40ce4532cbc5",
+      "name": "Source"
+    },
+    {
+      "parameters": {
+        "jsCode": "const entry = $input.first().json.body.entry[0];\nlet type = 'unknown';\n\nif (entry.messaging) {\n  type = 'messages';\n} else if (entry.changes) {\n  type = 'comments';\n}\n\nreturn [{ json: { ...$input.first().json.body.entry[0], type } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1024,
+        1264
+      ],
+      "id": "16c656f9-2d05-4298-a0fe-70bc088c4f68",
+      "name": "Data"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        560,
+        1216
+      ],
+      "id": "87d4918e-d526-462e-a207-5f92cf28fc3f",
+      "name": "Merge2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "28d550a6-b20f-4631-9191-7558718c0b3c",
+              "leftValue": "={{ $json.messaging[0].recipient.id }}",
+              "rightValue": "17841456702884465",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "df1902a0-9a16-4266-b362-efa4b7b63d7f",
+              "leftValue": "={{ $json.type == 'messages'\n  && !!$json.messaging[0].message.text}}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -832,
+        1264
+      ],
+      "id": "7ee616a4-6c1e-45ab-9548-7716c9220d71",
+      "name": "Valid?1",
+      "notesInFlow": true,
+      "notes": "Also checks our IG is receiver\n\n17841444199160037 - redstone\n17841472791484764 - our ai expert\n17841456702884465 - wowlaser\n\nTo also validate comments: \n{{ $json.type == 'messages'\n  ? !!$json.messaging[0].message.text\n  : !!$json.entry.changes[0].value.text}}"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2224,
+        1216
+      ],
+      "id": "e22bc407-5b43-4826-8513-f712d3aa5db7",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5d18df83-43c5-480a-8804-a1a076761230",
+              "name": "fromID",
+              "value": "={{ $json.messaging[0].sender.id }}",
+              "type": "string"
+            },
+            {
+              "id": "f72c3516-648c-4783-ae7f-06a6ab8228c6",
+              "name": "recipientID",
+              "value": "={{ $json.messaging[0].recipient.id }}",
+              "type": "string"
+            },
+            {
+              "id": "0f783b5f-a26c-41dd-9ef1-6ed6c2210745",
+              "name": "message",
+              "value": "={{ $json.messaging[0].message.text }}",
+              "type": "string"
+            },
+            {
+              "id": "b0c5b796-d588-46e8-beec-a577eca47f54",
+              "name": "accountID",
+              "value": "={{ $json.messaging[0].recipient.id }}",
+              "type": "string"
+            },
+            {
+              "id": "7aab5573-a77e-49cd-8406-91689642a6da",
+              "name": "client_username",
+              "value": "={{ $json.client_username }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        960,
+        1184
+      ],
+      "id": "610339e2-324e-4a46-8a9f-4183294a1744",
+      "name": "Message Data1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract and parse only the required keys from the JSON string in 'output'\nreturn items.map(item => {\n  const parsed = JSON.parse(item.json.output);\n  return {\n    json: {\n      message_reply: parsed.message_reply,\n      transfer: parsed.transfer,\n      should_answer: parsed.should_answer,\n      transfer_reason: parsed.transfer_reason,\n      user_name: parsed.user_name,\n      user_phone: parsed.user_phone,\n      user_preferred_date: parsed.user_preferred_date\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2016,
+        1328
+      ],
+      "id": "cd40fdf3-fe05-42ca-a3cc-103a4bae4179",
+      "name": "Parse to JSON1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "fb1fe484-a7eb-42e5-aa53-41e60bed7a2f",
+              "leftValue": "={{ $json.should_answer }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2480,
+        1216
+      ],
+      "id": "aec8d67b-ee17-487a-b59c-426d07a880c0",
+      "name": "Should answer?1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v22.0/me/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "recipient.id",
+              "value": "={{ $json.fromID }}"
+            },
+            {
+              "name": "message.text",
+              "value": "={{ $json.message_reply }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2784,
+        1216
+      ],
+      "id": "2299a930-8666-4f8c-b996-3415e34fa64f",
+      "name": "Send Message Reply1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "UK2V8ulWy3pc2EdB",
+          "name": "Wow laser"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5bb77117-83c4-4a37-a91f-4f4737048fae",
+              "leftValue": "={{ $json.transfer }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2480,
+        976
+      ],
+      "id": "adca0dec-c7f5-4a31-8bd3-3df1a3d4c316",
+      "name": "Transfer?"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'https://fmvzsfizkiimeavbdton.supabase.co/rest/v1/nikolay_tattoo_clients' + '?on_conflict=client_id' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({client_id: $json.fromID, state: 'closed'}) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2784,
+        736
+      ],
+      "id": "d9eb9a54-b24a-4456-9789-017548f842a8",
+      "name": "Upsert Clients",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "woWs2SoFYkGNkCXD",
+          "name": "ClientRecords Supabase Auth Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2784,
+        960
+      ],
+      "id": "01e02777-94cc-4bad-87db-97d487174722",
+      "name": "Wait",
+      "webhookId": "89cfddf2-4cc4-4df8-ad37-312d482245ca"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    body: $input.first().json.query[\"hub.challenge\"]\n  }\n]\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -592,
+        1552
+      ],
+      "id": "6b1278a3-2350-47dd-90e1-2cb8f79e6738",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.body }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "text/plain"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -448,
+        1552
+      ],
+      "id": "e5d9a476-3f5e-4887-a119-be8ca79a3e81",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v17.0/1071003965002068?fields=username",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1792,
+        688
+      ],
+      "id": "04c051b3-c5d2-475c-a709-962a1c3e68ea",
+      "name": "GET IG User",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "uKzGSRIvMzI89Y5O",
+          "name": "Red stone insta"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v17.0/maqs.oh?fields=username",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1568,
+        688
+      ],
+      "id": "0e88ac18-7a04-4d28-a237-028ab541c13e",
+      "name": "GET IG ID",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "uKzGSRIvMzI89Y5O",
+          "name": "Red stone insta"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "wowlaser.ig",
+        "options": {
+          "noResponseBody": true
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1280,
+        1264
+      ],
+      "id": "cf3e1df5-d478-49cf-bd56-618b158b7723",
+      "name": "Webhook",
+      "webhookId": "b397edaa-d456-4a2e-9a36-384bbba30b77"
+    },
+    {
+      "parameters": {
+        "jsCode": "function escapeMarkdownV2(text) {\n  return text.replace(/([_*\\[\\]()~`>#+\\-=|{}.!])/g, '\\\\$1')\n}\n\nreturn items.map(item => {\n  const data = item.json\n  const lines = []\n\n  if (data.user_name && data.user_name !== 'unknown')\n    lines.push(`👤 Client name: ${data.user_name}`)\n\n  if (data.client_username && data.client_username !== 'unknown') {\n    const username = data.client_username.replace(/^@/, ''); \n    const profileUrl = `https://instagram.com/${username}`\n    //const escapedUsername = escapeMarkdownV2(username)\n    //const escapedUrl = escapeMarkdownV2(profileUrl)\n    lines.push(`📱 Instagram: [@${username}](${profileUrl})`)\n  }\n\n  if (data.user_phone && data.user_phone !== 'unknown')\n    lines.push(`📞 Phone: ${data.user_phone}`)\n\n  if (data.user_preferred_date && data.user_preferred_date !== 'unknown')\n    lines.push(`🗓 Preferred date: ${data.user_preferred_date}`)\n\n  if (data.transfer_reason && data.transfer_reason.trim())\n    lines.push(`💬 Transfer reason: ${data.transfer_reason}`)\n\n  return {\n    json: {\n      message: lines.join('\\n')\n    }\n  }\n})\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2976,
+        960
+      ],
+      "id": "675aece6-061c-44e1-a8bf-337c43b4ef04",
+      "name": "Handoff Message"
+    },
+    {
+      "parameters": {
+        "chatId": "-1003037047641",
+        "text": "={{ $json.transfer_reason }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2048,
+        624
+      ],
+      "id": "bc00bd09-e4aa-4258-a1d3-4e0fc90fd702",
+      "name": "Send Message To Group1",
+      "webhookId": "10d7054c-6371-457c-b39e-c298f92cea07",
+      "credentials": {
+        "telegramApi": {
+          "id": "RjFhbLnDMoH8VW2V",
+          "name": "AI Manager Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "-1003037047641",
+        "text": "={{ $json.message }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3200,
+        960
+      ],
+      "id": "bcd66add-d8a6-4f44-b0dc-81692e338284",
+      "name": "Send Message To Group",
+      "webhookId": "10d7054c-6371-457c-b39e-c298f92cea07",
+      "credentials": {
+        "telegramApi": {
+          "id": "RjFhbLnDMoH8VW2V",
+          "name": "AI Manager Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "hTQ0703gjF1nKSnj",
+          "mode": "list",
+          "cachedResultName": "IG_HandleSupabaseClient"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "supabase_clients_url": "https://fmvzsfizkiimeavbdton.supabase.co/rest/v1/nikolay_tattoo_clients",
+            "client_id": "={{ $json.messaging[0].sender.id }}",
+            "ig_user_token": "EAAJ4gBi97w8BP8Yrxr4GPGmx1AVd6osRLOLsm8KfVMgnZBu5PZARHIEk5Aa5Gme27m0zJAbbcrohk6vWiFiK6nQeoMjNvYbZB744MossvdGcquNtM0vkYRLZCVXeSxWWSL1p3IWR1wVFZAyXkDdANudzjatQqKOkPm3hrqcMRx11C616bbQxBwZAnsaYZCCUzxsZAOZCn7PGh"
+          },
+          "matchingColumns": [
+            "messaging",
+            "messaging_firstItem"
+          ],
+          "schema": [
+            {
+              "id": "supabase_clients_url",
+              "displayName": "supabase_clients_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "client_id",
+              "displayName": "client_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "ig_user_token",
+              "displayName": "ig_user_token",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        368,
+        1072
+      ],
+      "name": "Supabase",
+      "id": "657a1403-35c8-46e4-9702-71a1346e6c3a"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1408,
+        1200
+      ],
+      "id": "28484811-f39b-4fce-a475-d5152acf0ed7",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "aQ7Tf4TGBCi7kcf0",
+          "mode": "list",
+          "cachedResultName": "HandleMessageStack"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "wait_seconds": 60,
+            "upstash_base_url": "https://intent-guinea-6714.upstash.io",
+            "client_id": "={{ $json.fromID }}",
+            "message": "={{ $json.message }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "upstash_base_url",
+              "displayName": "upstash_base_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "wait_seconds",
+              "displayName": "wait_seconds",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "client_id",
+              "displayName": "client_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1184,
+        1344
+      ],
+      "id": "67998ef5-44d1-49d6-80d2-acebca4a6654",
+      "name": "HandleMessageStack"
+    },
+    {
+      "parameters": {
+        "chatId": "503775021",
+        "text": "={{ $json.message }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3360,
+        704
+      ],
+      "id": "0afcb04d-c035-4c74-b57d-16f9b9928dc2",
+      "name": "TEST",
+      "webhookId": "10d7054c-6371-457c-b39e-c298f92cea07",
+      "credentials": {
+        "telegramApi": {
+          "id": "RjFhbLnDMoH8VW2V",
+          "name": "AI Manager Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.fromID }}",
+        "contextWindowLength": 15
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1152,
+        1712
+      ],
+      "id": "4f985203-b236-4e51-8fa2-34122c452c0e",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.fromID }}",
+        "tableName": "nikolay_tattoo_chat_histories",
+        "contextWindowLength": 25
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        1664,
+        1584
+      ],
+      "id": "4631b9c1-a684-4be0-8429-29befa42edaa",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "dbUvQyOOeDxRzHfe",
+          "name": "ClientRecords"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {
+          "responseFormat": "json_object"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1536,
+        1584
+      ],
+      "id": "a558e570-521d-4039-8a53-fa297055c6ad",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "kxH60aJwWWGZzBaI",
+          "name": "Gosha GPT Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "1a708e81-d84f-4d11-836b-ae0e9b36c0c1",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -736,
+        1552
+      ],
+      "id": "a120f168-f23f-4908-b0f8-b54c9840540c",
+      "name": "GET",
+      "webhookId": "1a708e81-d84f-4d11-836b-ae0e9b36c0c1"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      user_name: 'Alice Johnson',\n      client_username: '@mint_comet',\n      user_phone: '+1 234 567 890',\n      user_preferred_date: '2025-11-08',\n      transfer_reason: 'Asked to be contacted directly by a manager.'\n    }\n  }\n]\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3184,
+        752
+      ],
+      "id": "7850ef18-6b94-4a59-81b1-5fc2963f20ce",
+      "name": "TEST JSON"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3c75fb1a-48e5-4267-9c22-c4a169f79da0",
+              "name": "mid",
+              "value": "={{ $json.messaging[0].message.mid }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -592,
+        864
+      ],
+      "id": "96991c87-19ba-4632-b591-ecb500716eb9",
+      "name": "mid"
+    },
+    {
+      "parameters": {
+        "url": "=https://intent-guinea-6714.upstash.io/get/${{ $json.mid }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -432,
+        864
+      ],
+      "id": "440f2a67-debc-4905-9de0-09721aa87649",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "BfV7pnbm9L2uaLya",
+          "name": "Upstash Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0f27a492-2ec4-4dff-b0c3-ec905740c42f",
+              "leftValue": "={{ $json.result }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -224,
+        864
+      ],
+      "id": "7dc861ab-4eae-4db5-a0c1-f5af461ea824",
+      "name": "Duplicate?"
+    },
+    {
+      "parameters": {
+        "jsCode": "return []"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -32,
+        752
+      ],
+      "id": "70ecda8e-8f82-4e3c-b199-e1e0a68b946a",
+      "name": "Stop"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://intent-guinea-6714.upstash.io/setex/${{ $('mid').first().json.mid }}/300/1",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -16,
+        960
+      ],
+      "id": "d2791882-9df4-4f56-a85e-ece61d90e982",
+      "name": "HTTP Request1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "BfV7pnbm9L2uaLya",
+          "name": "Upstash Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        144,
+        1232
+      ],
+      "id": "45613a17-dae7-4354-837f-bc5114c2075c",
+      "name": "Merge3"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.orbitalgarden.space",
+            "user-agent": "facebookexternalua",
+            "content-length": "485",
+            "accept": "*/*",
+            "accept-encoding": "deflate, gzip",
+            "content-type": "application/json",
+            "facebook-api-version": "v24.0",
+            "via": "1.1 Caddy",
+            "x-forwarded-for": "173.252.79.2",
+            "x-forwarded-host": "n8n.orbitalgarden.space",
+            "x-forwarded-proto": "https",
+            "x-hub-signature": "sha1=5629ef3a79136bf609ebf84cd279bddb6546fcde",
+            "x-hub-signature-256": "sha256=80659fc7d6c847636e5ed533c07c22db0a75928296a5b087012499864ba83f0b"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "object": "instagram",
+            "entry": [
+              {
+                "time": 1761203780377,
+                "id": "17841456702884465",
+                "messaging": [
+                  {
+                    "sender": {
+                      "id": "1179247697399594"
+                    },
+                    "recipient": {
+                      "id": "17841456702884465"
+                    },
+                    "timestamp": 1761203779511,
+                    "message": {
+                      "mid": "aWdfZAG1faXRlbToxOklHTWVzc2FnZAUlEOjE3ODQxNDU2NzAyODg0NDY1OjM0MDI4MjM2Njg0MTcxMDMwMTI0NDI1OTk5ODc3MjU5Mjc3OTYxMTozMjQ4ODQ3NTM4MjMwNDU4NDc0NjUzMzAwMDcwMDc1NTk2OAZDZD",
+                      "text": "Может завтра в 9 вечера?"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "webhookUrl": "https://n8n.orbitalgarden.space/webhook/wowlaser.ig",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Parse to JSON1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "search_info": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "rejuvenation_picosure_info": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "carbon_peeling_info": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "tattoo_removal_info": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Source": {
+      "main": [
+        [
+          {
+            "node": "Message Data1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Data": {
+      "main": [
+        [
+          {
+            "node": "Valid?1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Source",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Valid?1": {
+      "main": [
+        [
+          {
+            "node": "mid",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Should answer?1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Transfer?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message Data1": {
+      "main": [
+        [
+          {
+            "node": "HandleMessageStack",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse to JSON1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Should answer?1": {
+      "main": [
+        [
+          {
+            "node": "Send Message Reply1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transfer?": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Upsert Clients",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Handoff Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET IG User": {
+      "main": [
+        []
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Handoff Message": {
+      "main": [
+        [
+          {
+            "node": "Send Message To Group",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HandleMessageStack": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        []
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TEST JSON": {
+      "main": [
+        [
+          {
+            "node": "TEST",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "mid": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Duplicate?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Duplicate?": {
+      "main": [
+        [
+          {
+            "node": "Stop",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge3": {
+      "main": [
+        [
+          {
+            "node": "Supabase",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/New_York",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "dc7a7bb0-9347-4019-ab79-981c23a22bc9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c9e53a150db3979558dce85b88732650eafd440e09b4690afc30683da1136ad9"
+  },
+  "id": "vbzvuTqfybMZJK15",
+  "tags": [
+    {
+      "createdAt": "2025-10-29T17:09:52.649Z",
+      "updatedAt": "2025-10-29T17:09:52.649Z",
+      "id": "hcmv4AsIBvrEdV4f",
+      "name": "INSTA"
+    },
+    {
+      "createdAt": "2025-09-14T12:25:31.358Z",
+      "updatedAt": "2025-09-14T12:25:31.358Z",
+      "id": "oi3mfeDHd8seIZYf",
+      "name": "latest"
+    }
+  ]
+}

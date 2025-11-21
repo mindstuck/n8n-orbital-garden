@@ -1,0 +1,1684 @@
+{
+  "name": "serhii_consulting",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message }}",
+        "options": {
+          "systemMessage": "=# Role\nТи — бізнес-асистент Сергія, який кваліфікує потенційних клієнтів та пропонує безкоштовну діагностику бізнесу.  \nТвоя комунікація — легка, природна, доброзичлива, але структурована.  \nГовори українською.  \n\n# Ціль\nДопомогти зрозуміти бізнес клієнта, встановити довіру і м’яко перейти до пропозиції діагностики або консультації.\n\n# Стиль спілкування\n- Максимально природний, дружній тон, без зайвої формальності.\n- Короткі повідомлення (1–2 речення, рідко більше).\n- Завжди розділяй повідомлення на абзаци.\n- В абзаці ніколи не має бути більше 2х речень.\n- Можеш іноді додавати емодзі, якщо це звучить доречно.\n- Ніколи не вибачайся.\n- Уникай канцеляризмів (“наш сервіс пропонує”, “згідно з досвідом” тощо).\n- Не копіюй приклади дослівно — орієнтуйся на стиль, не на конкретні фрази.\n- Якщо клієнт ділиться чимось особистим або незвичним — спершу щира реакція, потім питання.\n\n# Формат Відповіді\nЗавжди повертай JSON у наступному форматі:\n{\n\"message_reply\": \"Текстова відповідь користувачу\",\n\"transfer\": false,\n\"transfer_reason\": \"Причина переводу на менеджера\",\n\"should_answer\": true,\n\"business\": \"Онлайн-магазин одягу в інстаграмі\",\n\"monthly_turnover\": \"5200$\",\n\"team\": \"Є менеджер та таргетолог, не планує наймати найближчим часом\",\n\"goals\": \"Підвищити продажі\",\n\"recommended_product\": \"Менторка\"\n}\n- \"message_reply\": текстова відповідь користувачу.\n- \"transfer\": true/false – чи потрібен перевод на менеджера.\n- \"transfer_reason\": коротке повідомлення менеджеру для пояснення причини переводу.\n- \"should_answer\": true/false – чи необхідно відповідати користувачу.\n- \"business\": Ніша бізнесу користувача (або \"unknown\").\n- \"monthly_turnover\": Щомісячний оборот користувача у доларах (або \"unknown\").\n- \"team\": Деталі щодо команди користувача (або \"unknown\").\n- \"goals\": Задачі бізнесу, які користувач хоче вирішувати (або \"unknown\").\n- \"recommended_product\": Послуга, яку рекомендуєш користувачеві; до $5k щомісячного обороту - менторка, до $10k маркетинг та продажі, більше $10k індивідуальні консультації (або \"unknown\").\n- Текстові поля (наприклад, \"message_reply\") завжди вказуються. Якщо текст відсутній, вказуй порожню строку \"\".\n\n# Розбавочні фрази\n- Іноді додавай короткі природні фрази, щоб звучати по-людськи.\n- Приклади:\n  - “Зрозумів)”\n  - “Ок, бачу”\n  - “Добре, цікаво”\n  - “Розкажіть трохи детальніше”\n  - “Чудово)”\n  - “Так, логічно”\n- Використовуй максимум одну таку фразу на 2–3 повідомлення.\n- Якщо бачиш, що клієнт ділиться важливими або особистими деталями — можна додати емпатичну реакцію (див. нижче).\n\n# Емпатичні вставки\n- Якщо клієнт говорить щось цікаве, незвичне або особисте — додавай коротку природну реакцію перед основним питанням.\n- Вставки створюють ефект щирої уваги, допомагають уникнути “роботизованості”.\n- Використовуй лише тоді, коли це природно.\n- Приклади:\n  - “О, цікаво)” \n  - “Вау, це щось новеньке)” \n  - “Розумію, буває складно)” \n  - “Клас, що розвиваєтесь у цій сфері)” \n  - “Нічого собі, непроста історія)” \n  - “Як здоров’я зараз?)” \n  - “Приємно, що ділитесь)”\n  - “О, круто, що маєте кілька напрямів)”\n  - “Буває, головне не зупинятись)”\n\n# Коли доречно додавати емпатичну вставку\n| Контекст повідомлення клієнта | Приклад реакції |\n|-------------------------------|-----------------|\n| Клієнт описує нішу або унікальність бізнесу | “О, цікаво. Це новий напрям?)” |\n| Клієнт ділиться труднощами, невдачами | “Розумію, буває складно)” |\n| Клієнт згадує особисті обставини (здоров’я, сім’я, лікарня тощо) | “Ого, непросто... Як почуваєтесь зараз?” |\n| Клієнт говорить, що все добре або зростає | “Клас, радію за вас)” |\n| Клієнт вагається або сумнівається | “Розумію, рішення не просте” |\n| Клієнт згадує команду або партнерів | “О, круто, що у вас є команда)” |\n| Клієнт говорить про паузу, зміну планів | “Буває, головне не зупинятись)” |\n\n# Важливо\n- Головне — звучати щиро.  \n- Не будь нав’язливим або штучно “теплим”.  \n- Якщо не впевнений, чи доречна емпатична реакція — краще не додавати.\n- Завжди дотримуйся природного темпу діалогу: реакція → уточнення → запитання.\n\n# Приклад логіки\n1. Клієнт пише щось про себе або бізнес → ти реагуєш короткою емпатичною фразою → потім ставиш запитання для кваліфікації.  \n2. Якщо клієнт виявляє сумнів → визнай його (“розумію, не завжди просто вирішити”) → і запропонуй подивитись діагностику без зобов’язань.  \n3. Якщо клієнт погоджується → уточни деталі бізнесу або бюджет.  \n4. Якщо клієнт ділиться чимось особистим (здоров’я, пауза, сім’я) → реагуй щиро, без продажу в тому ж повідомленні.\n\n# Етапи кваліфікації клієнта\nТвоя задача — провести людину через коротку кваліфікацію, щоб зрозуміти:\n1. У якій ніші бізнес.\n2. Який зараз рівень (оборот, кількість клієнтів).\n3. Чи є команда.\n4. Які цілі / проблеми / головні виклики зараз.\n5. Чи є бюджет або готовність інвестувати в розвиток.\n6. М’яко запропонувати безкоштовну діагностику.\n7. Після того, як запропонував діагностику: \n  - Клієнт погодився → “Чудово, тоді зараз перевірю свій графік і за декілька хвилин до вас повернусь”\n  - Клієнт не погодився або сумнівається → Не тисни, але поясни цінність.\n\n# Правила\n- Завжди рухайся логічно по етапах, не перескакуй.  \n- Якщо клієнт сам зачіпає один із пунктів — скороти шлях (наприклад, якщо вже назвав нішу і оборот — переходь до команди).\n- Ніколи не пропонуй інші послуги окрім безкоштовної діагностики.\n- Мета — звучати природно, але завжди вести до діагностики.\n\n# Логіка переводу на менеджера (\"transfer\": true)\nВстановлюй \"transfer\": true у наступних випадках:\n1. Кваліфікація успішно завершена АБО Клієнт переходить до організаційних питань\n   - Клієнт прямо погодився на діагностику.\n   - АБО: Клієнт запитує про **час, дату, формат** (наприклад: \"можна завтра?\", \"як це проходить?\", \"це онлайн?\").\n   - Дія:\n     1. Якщо було питання про формат — коротко відповідай (напр. \"Це онлайн зустріч/Zoom\").\n     2. Щодо часу — НІКОЛИ не обіцяй конкретний час сам. Використовуй стандартну фразу: \"Зараз перевірю графік і повернусь до вас\".\n     3. Став \"transfer\": true.\n   - Приклад reason: \"Клієнт погодився/запитує про час. Переводжу на узгодження\".\n2. Питання поза компетенцією\n   - Клієнт ставить питання, на яке ти не знаєш відповіді, або яке вимагає перевірки календаря (наприклад, \"чи вільні ви о 10:00?\", юридичні тонкощі, складні технічні питання, особисте життя Сергія).\n   - Оскільки ти не маєш доступу до реального календаря, ти завжди маєш відповідати через фразу \"перевірю графік\" і переводити.\n   - Приклад reason: \"Питання про конкретний слот часу/специфічне питання\".\n3. Відмова або глухий кут\n   - Клієнт відмовляється відповідати (\"не хочу казати\").\n   - Клієнт просить менеджера/людину.\n   - Приклад reason: \"Клієнт відмовляється проходити кваліфікацію\".\n\n# Особливі випадки\nАВТОМАТИЗАЦІЯ: Якщо користувач надсилає слова \"Гайд\", \"Конкурент\" або \"Хук\" (у будь-якому регістрі):\nДія: ІГНОРУВАТИ. Не генеруй жодного тексту.\nJSON: \"should_answer\": false, \"message_reply\": \"\"\n\n# Dialogue Examples\n<dialogExample>\n  <client>Привіт! Бачила вашу рекламу, хочу більше дізнатись.</client>\n  <assistant>Привіт) У якій ніші ваш бізнес?</assistant>\n  <client>Я запускаю онлайн-курси для мам у декреті.</client>\n  <assistant>Цікаво) Гарна ніша. А який зараз щомісячний оборот?</assistant>\n  <client>Невеликий, близько 2к доларів.</client>\n  <assistant>Ок, у вас вже є команда чи працюєте самі?</assistant>\n  <client>Є тільки помічниця, яка веде соцмережі.</client>\n  <assistant>Клас, що вже не самі) Які задачі зараз головні — заявки, система продажів, автоматизація?</assistant>\n  <client>Я хочу щоденний потік заявок і зрозумілу систему, як продавати курс стабільно.</client>\n  <assistant>Можу зробити діагностику (це безкоштовно) і план для зростання продажів. Як вам така ідея?</assistant>\n  <client>Не знаю, я подумаю</client>\n  <assistant>Розумію, рішення не просте. Але це допоможе зекономити час і гроші.</assistant>\n  <client>Ну добре, давайте зробимо)</client>\n  <assistant>Чудово) Перед визначенням часу — чи є бюджет на розвиток?</assistant>\n  <client>Так, є близько 10 тисяч доларів, які хочу вкласти</client>\n  <assistant>Чудово, тоді зараз перевірю свій графік і за декілька хвилин до вас повернусь</assistant>\n</dialogExample>\n\n\n<dialogExample>\n  <client>У мене агентство нерухомості.</client>\n  <assistant>О, цікаво) І як у вас з клієнтами зараз?</assistant>\n  <client>3-4 в місяць виходить на одного рієлтора, це тільки власники.</client>\n  <assistant>А на оренду багато клієнтів?</assistant>\n  <client>На оренду більше, умовно 5-6 власників і до 15 клієнтів в місяць.</client>\n  <assistant>Клас, непогано) Плануєте збільшувати ці результати?</assistant>\n</dialogExample>\n\n\n<dialogExample>\n  <client>Я програміст, але ще маю агенцію нерухомості SONATA.</client>\n  <assistant>Так, я бачу, що у вас кілька напрямів) А що зараз у пріоритеті?</assistant>\n  <client>SONATA. Але останні півтора року я пролежав у лікарні.</client>\n  <assistant>Ого, це непросто... Як почуваєтесь зараз?)</assistant>\n  <client>Уже краще, потрохи повертаюсь до справ.</client>\n  <assistant>Радий чути) І як плануєте розвивати агенцію зараз?</assistant>\n</dialogExample>\n\n\n<dialogExample>\n  <client>У мене маленький магазин дитячого одягу в Чернівцях.</client>\n  <assistant>Звучить затишно) Це локальний бізнес чи є онлайн?</assistant>\n  <client>Поки що тільки Instagram.</client>\n  <assistant>Зрозумів. І як у вас зараз із замовленнями?</assistant>\n  <client>Трохи впало останнім часом.</client>\n  <assistant>Так, зараз у багатьох схожа ситуація) Хочете подивимось, як можна відновити потік?</assistant>\n</dialogExample>\n\n\n<dialogExample>\n  <client>Я займаюсь handmade-свічками.</client>\n  <assistant>О, класна ніша) А де зараз продаєте - маркетплейси чи Instagram?</assistant>\n  <client>Поки що через сторінку в Instagram.</client>\n  <assistant>Добре, бачу. А ви самі займаєтесь виробництвом чи є команда?</assistant>\n  <client>Поки що сама, але думаю про помічника.</client>\n  <assistant>Так, це гарна ідея) Коли є допомога - зростання швидше.</assistant>\n</dialogExample>\n\n<dialogExample>\n  <client>Хочу на менторку записатися</client>\n  <assistant>Дивіться)\n\nЩоб залучати клієнтів з онлайн потрібно розуміти як це робити, на моїй програмі навчання ми пропрацьовано всі аспекти, упаковку продукту, маркетинг, продажі, таргет. \n\nПотрапити в програму можна лише після короткої діагностики, вона безкоштовна. \n\nЯк вам така ідея ?</assistant>\n</dialogExample>\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        1728,
+        1328
+      ],
+      "id": "2bb74164-a5cb-4aef-ad3d-051be6d277b2",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "messages",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "50379fd2-97c7-44d8-a8c5-4bce29d907e0"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Message"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ba020349-9e99-424b-8e41-92fb186db962",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "comments",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Comment"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        736,
+        1216
+      ],
+      "id": "9349435c-5a3c-4441-a9e2-c98b79a9f4ca",
+      "name": "Source"
+    },
+    {
+      "parameters": {
+        "jsCode": "const entry = $input.first().json.body.entry[0];\nlet type = 'unknown';\n\nif (entry.messaging) {\n  type = 'messages';\n} else if (entry.changes) {\n  type = 'comments';\n}\n\nreturn [{ json: { ...$input.first().json.body.entry[0], type } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1024,
+        1264
+      ],
+      "id": "b23de820-e9c3-4500-bed8-b45f33718cc6",
+      "name": "Data"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        560,
+        1216
+      ],
+      "id": "0df7ff7b-915d-41d6-9b57-d6ef8c9a7618",
+      "name": "Merge2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "28d550a6-b20f-4631-9191-7558718c0b3c",
+              "leftValue": "={{ $json.messaging[0].recipient.id }}",
+              "rightValue": "17841401285847074",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "df1902a0-9a16-4266-b362-efa4b7b63d7f",
+              "leftValue": "={{ $json.type == 'messages'\n  && !!$json.messaging[0].message.text}}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -832,
+        1264
+      ],
+      "id": "e7b13c2f-ef45-4e2f-8214-0ab85f6230fd",
+      "name": "Valid?1",
+      "notesInFlow": true,
+      "notes": "Also checks our IG is receiver\n\n17841444199160037 - redstone\n17841472791484764 - our ai expert\n17841456702884465 - wowlaser\n\nTo also validate comments: \n{{ $json.type == 'messages'\n  ? !!$json.messaging[0].message.text\n  : !!$json.entry.changes[0].value.text}}"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2224,
+        1216
+      ],
+      "id": "44e137ea-4a99-41d3-86e6-4268f133aa5c",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5d18df83-43c5-480a-8804-a1a076761230",
+              "name": "fromID",
+              "value": "={{ $json.messaging[0].sender.id }}",
+              "type": "string"
+            },
+            {
+              "id": "f72c3516-648c-4783-ae7f-06a6ab8228c6",
+              "name": "recipientID",
+              "value": "={{ $json.messaging[0].recipient.id }}",
+              "type": "string"
+            },
+            {
+              "id": "0f783b5f-a26c-41dd-9ef1-6ed6c2210745",
+              "name": "message",
+              "value": "={{ $json.messaging[0].message.text }}",
+              "type": "string"
+            },
+            {
+              "id": "b0c5b796-d588-46e8-beec-a577eca47f54",
+              "name": "accountID",
+              "value": "={{ $json.messaging[0].recipient.id }}",
+              "type": "string"
+            },
+            {
+              "id": "7aab5573-a77e-49cd-8406-91689642a6da",
+              "name": "client_username",
+              "value": "={{ $json.client_username }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        960,
+        1184
+      ],
+      "id": "64688696-c885-4c2b-bf1d-f329a3966476",
+      "name": "Message Data1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract and parse only the required keys from the JSON string in 'output'\nreturn items.map(item => {\n  const parsed = JSON.parse(item.json.output);\n  return {\n    json: {\n      message_reply: parsed.message_reply,\n      transfer: parsed.transfer,\n      transfer_reason: parsed.transfer_reason,\n      should_answer: parsed.should_answer,\n      business: parsed.business,\n      monthly_turnover: parsed.monthly_turnover,\n      team: parsed.team,\n      goals: parsed.goals,\n      recommended_product: parsed.recommended_product\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2032,
+        1328
+      ],
+      "id": "258e2650-2002-4b21-bfae-0740e6b2eac0",
+      "name": "Parse to JSON1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "fb1fe484-a7eb-42e5-aa53-41e60bed7a2f",
+              "leftValue": "={{ $json.should_answer }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2480,
+        1216
+      ],
+      "id": "8117c352-ab01-4410-b74d-f7c300ba14ed",
+      "name": "Should answer?1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v22.0/me/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAAV8UjEiN4QBP3mAmQFoZArZAtXBkTKHh0fb5IpR6X9qVvVEoEspr5oIhjvMEHSgjcxV8DZB50ZBRoZAFBhUwIMhho0FLB58K08AQmgP9eAlPzidMClW75RQpyUkoGdSg801d1Pgn9ncZBafW9EzjZC2xvZByUajH6bNXzUzrHTIMlu6PwAuIArimTK8ZCF7smNjg3hQpEUDzegZDZD"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "recipient.id",
+              "value": "={{ $json.fromID }}"
+            },
+            {
+              "name": "message.text",
+              "value": "={{ $json.message_reply }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2784,
+        1216
+      ],
+      "id": "9b18f288-0bc9-48fd-8251-ec69be4aa399",
+      "name": "Send Message Reply1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5bb77117-83c4-4a37-a91f-4f4737048fae",
+              "leftValue": "={{ $json.transfer }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2480,
+        976
+      ],
+      "id": "a82675c6-1965-4a39-bb2f-cf56bc8b1810",
+      "name": "Transfer?"
+    },
+    {
+      "parameters": {
+        "method": "=POST",
+        "url": "={{ 'https://fmvzsfizkiimeavbdton.supabase.co/rest/v1/serhii_consulting_clients' + '?on_conflict=client_id' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({client_id: $json.fromID, state: 'closed'}) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2784,
+        736
+      ],
+      "id": "ca4d69b8-2b20-49bf-a091-2e90a6b0f4ee",
+      "name": "Upsert Clients",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "woWs2SoFYkGNkCXD",
+          "name": "ClientRecords Supabase Auth Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2784,
+        960
+      ],
+      "id": "555ed9f6-4339-4a07-bedd-d2282e76e684",
+      "name": "Wait",
+      "webhookId": "9f5ab9bc-ca4a-4f75-806b-e4e44ad5c558"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    body: $input.first().json.query[\"hub.challenge\"]\n  }\n]\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -592,
+        1552
+      ],
+      "id": "237c86c9-0fc5-4808-b8bd-a11bd2ba1a46",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.body }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "text/plain"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -448,
+        1552
+      ],
+      "id": "b38317d4-d75c-441d-9021-3e4419f575be",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v17.0/1071003965002068?fields=username",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1792,
+        688
+      ],
+      "id": "0ac6b715-5345-4bab-9d99-0763a722ce6a",
+      "name": "GET IG User",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "uKzGSRIvMzI89Y5O",
+          "name": "Red stone insta"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v17.0/maqs.oh?fields=username",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1568,
+        688
+      ],
+      "id": "c0b0d194-6645-43d2-bf01-eaf02754d2e1",
+      "name": "GET IG ID",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "uKzGSRIvMzI89Y5O",
+          "name": "Red stone insta"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "serhii_consulting.ig",
+        "options": {
+          "noResponseBody": true
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1280,
+        1264
+      ],
+      "id": "b3f87695-1926-42f4-9772-657a183c01a0",
+      "name": "Webhook",
+      "webhookId": "ef6b1d71-3906-4757-a71b-42a7a637a660"
+    },
+    {
+      "parameters": {
+        "jsCode": "function escapeMarkdownV2(text) {\n  return text.replace(/([_*\\[\\]()~`>#+\\-=|{}.!])/g, '\\\\$1')\n}\n\nreturn items.map(item => {\n  const data = item.json\n  const lines = []\n\n  // --- CONTACT INFO (Usually passed from Trigger) ---\n  \n  if (data.client_username && data.client_username !== 'unknown') {\n    const username = data.client_username.replace(/^@/, ''); \n    const profileUrl = `https://instagram.com/${username}`\n    // Creates a clickable link in Telegram Markdown\n    lines.push(`📱 Instagram: [@${username}](${profileUrl})`)\n  }\n\n  // --- QUALIFICATION DATA (From AI Agent) ---\n\n  // Niche \n  if (data.business && data.business !== 'unknown')\n    lines.push(`🏢 Business: ${data.business}`)\n\n  // Turnover \n  if (data.monthly_turnover && data.monthly_turnover !== 'unknown')\n    lines.push(`💰 Turnover: ${data.monthly_turnover}`)\n\n  // Team details \n  if (data.team && data.team !== 'unknown')\n    lines.push(`👥 Team: ${data.team}`)\n\n  // Goals/Problems \n  if (data.goals && data.goals !== 'unknown')\n    lines.push(`🎯 Goals: ${data.goals}`)\n\n  // Recommended Product [cite: 14, 15]\n  if (data.recommended_product && data.recommended_product !== 'unknown')\n    lines.push(`📦 Recommended: ${data.recommended_product}`)\n\n  // --- TRANSFER LOGIC ---\n\n  // Reason for transfer [cite: 11]\n  if (data.transfer_reason && data.transfer_reason.trim())\n    lines.push(`\\n⚠️ Transfer reason: ${data.transfer_reason}`)\n\n  return {\n    json: {\n      message: lines.join('\\n')\n    }\n  }\n})"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2960,
+        960
+      ],
+      "id": "9e49f6a9-6a23-4c41-8099-9dffa9de2c7c",
+      "name": "Handoff Message"
+    },
+    {
+      "parameters": {
+        "chatId": "-1003037047641",
+        "text": "={{ $json.transfer_reason }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2048,
+        624
+      ],
+      "id": "8bdb3856-a934-452d-aece-5d2ecd96ff66",
+      "name": "Send Message To Group1",
+      "webhookId": "cc120f53-64ef-47aa-baff-a6efd8d4cefa",
+      "credentials": {
+        "telegramApi": {
+          "id": "RjFhbLnDMoH8VW2V",
+          "name": "AI Manager Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "-1003481815942",
+        "text": "={{ $json.message }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3184,
+        960
+      ],
+      "id": "61f12faa-7c30-432f-8bd9-7168414e2f06",
+      "name": "Send Message To Group",
+      "webhookId": "f50e57c1-2a67-4633-9b22-23bb30619d99",
+      "credentials": {
+        "telegramApi": {
+          "id": "RjFhbLnDMoH8VW2V",
+          "name": "AI Manager Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "hTQ0703gjF1nKSnj",
+          "mode": "list",
+          "cachedResultName": "IG_HandleSupabaseClient"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "supabase_clients_url": "https://fmvzsfizkiimeavbdton.supabase.co/rest/v1/serhii_consulting_clients",
+            "client_id": "={{ $json.messaging[0].sender.id }}",
+            "ig_user_token": "EAAV8UjEiN4QBP3mAmQFoZArZAtXBkTKHh0fb5IpR6X9qVvVEoEspr5oIhjvMEHSgjcxV8DZB50ZBRoZAFBhUwIMhho0FLB58K08AQmgP9eAlPzidMClW75RQpyUkoGdSg801d1Pgn9ncZBafW9EzjZC2xvZByUajH6bNXzUzrHTIMlu6PwAuIArimTK8ZCF7smNjg3hQpEUDzegZDZD"
+          },
+          "matchingColumns": [
+            "messaging",
+            "messaging_firstItem"
+          ],
+          "schema": [
+            {
+              "id": "supabase_clients_url",
+              "displayName": "supabase_clients_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "client_id",
+              "displayName": "client_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "ig_user_token",
+              "displayName": "ig_user_token",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        368,
+        1072
+      ],
+      "name": "Supabase",
+      "id": "3174dbcb-3484-4328-9d9a-3c3b5baee41c"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1408,
+        1200
+      ],
+      "id": "e7577ef4-dcb0-4ebc-9843-31cf67d2b1a3",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "aQ7Tf4TGBCi7kcf0",
+          "mode": "list",
+          "cachedResultName": "HandleMessageStack"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "wait_seconds": 60,
+            "upstash_base_url": "https://intent-guinea-6714.upstash.io",
+            "client_id": "={{ $json.fromID }}",
+            "message": "={{ $json.message }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "upstash_base_url",
+              "displayName": "upstash_base_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "wait_seconds",
+              "displayName": "wait_seconds",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "client_id",
+              "displayName": "client_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1184,
+        1344
+      ],
+      "id": "616201cb-3add-4693-9cb4-e6845c5f587a",
+      "name": "HandleMessageStack"
+    },
+    {
+      "parameters": {
+        "chatId": "-1003481815942",
+        "text": "={{ $json.user_name }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3344,
+        752
+      ],
+      "id": "9eb30cfc-27d6-41cb-89f4-445970659ef7",
+      "name": "TEST",
+      "webhookId": "aa6f3dc3-68af-4d01-bdcd-cd1ee7777413",
+      "credentials": {
+        "telegramApi": {
+          "id": "RjFhbLnDMoH8VW2V",
+          "name": "AI Manager Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.fromID }}",
+        "tableName": "serhii_consulting_chat_histories",
+        "contextWindowLength": 25
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        1744,
+        1568
+      ],
+      "id": "69311a8d-deef-473b-b035-f651f1882974",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "dbUvQyOOeDxRzHfe",
+          "name": "ClientRecords"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {
+          "responseFormat": "json_object"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1616,
+        1568
+      ],
+      "id": "6e4e978d-e10a-41a0-a60b-e65008a9fb39",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "kxH60aJwWWGZzBaI",
+          "name": "Gosha GPT Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "2a4747cd-5987-46ed-ae77-03b7672534a4",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -736,
+        1552
+      ],
+      "id": "eead8f15-215a-4f5a-bee7-790118dd4993",
+      "name": "GET",
+      "webhookId": "2a4747cd-5987-46ed-ae77-03b7672534a4",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      user_name: 'Alice Johnson',\n      client_username: '@mint_comet',\n      user_phone: '+1 234 567 890',\n      user_preferred_date: '2025-11-08',\n      transfer_reason: 'Asked to be contacted directly by a manager.'\n    }\n  }\n]\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3184,
+        752
+      ],
+      "id": "d4f51577-1862-49e9-8884-88c3f31ad953",
+      "name": "TEST JSON"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3c75fb1a-48e5-4267-9c22-c4a169f79da0",
+              "name": "mid",
+              "value": "={{ $json.messaging[0].message.mid }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -592,
+        864
+      ],
+      "id": "f4281ce4-6b8b-49b3-99b8-60ad4d3c37e9",
+      "name": "mid"
+    },
+    {
+      "parameters": {
+        "url": "=https://intent-guinea-6714.upstash.io/get/${{ $json.mid }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -432,
+        864
+      ],
+      "id": "caa491d5-fd7a-43c6-9e21-ad4b98298902",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "BfV7pnbm9L2uaLya",
+          "name": "Upstash Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0f27a492-2ec4-4dff-b0c3-ec905740c42f",
+              "leftValue": "={{ $json.result }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -224,
+        864
+      ],
+      "id": "83a5c26a-0f11-416b-8128-49d3baa41449",
+      "name": "Duplicate?"
+    },
+    {
+      "parameters": {
+        "jsCode": "return []"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -32,
+        752
+      ],
+      "id": "b931583a-6910-4c26-8e38-962bb7ae0aa8",
+      "name": "Stop"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://intent-guinea-6714.upstash.io/setex/${{ $('mid').first().json.mid }}/300/1",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -16,
+        960
+      ],
+      "id": "cc1f8c66-4666-4c86-a633-a5b59c7711e6",
+      "name": "HTTP Request1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "BfV7pnbm9L2uaLya",
+          "name": "Upstash Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        144,
+        1232
+      ],
+      "id": "b0103e85-3cf5-4819-b50a-78a1a1439205",
+      "name": "Merge3"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Використовуй цей інструмент add_qualified_lead для того, щоб записувати зібрану інформацію до таблиці.",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Xnqp9v968cu5FyFkRIBOmS-uSej6-zZ_BmTJ6I4rOZI",
+          "mode": "list",
+          "cachedResultName": "serhii_danchyshyn",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Xnqp9v968cu5FyFkRIBOmS-uSej6-zZ_BmTJ6I4rOZI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Xnqp9v968cu5FyFkRIBOmS-uSej6-zZ_BmTJ6I4rOZI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "business": "={{ $fromAI('business', 'Ніша бізнесу користувача, наприклад \"Продаж одягу в інстаграмі\"') }}",
+            "recommended_product": "={{ $fromAI('recommended_product', 'Послугу, яку рекомендуєш користувачеві; до $5k щомісячного обороту - менторка, до $10k - маркетинг та продажі, більше $10k - індивідуальні консультації') }}\n",
+            "goals": "={{ $fromAI('goals', 'Задачі бізнесу, які користувач хоче вирішувати') }}\n",
+            "team": "={{ $fromAI('team', 'Деталі щодо команди користувача, наприклад \"Є менеджер та таргетолог, не планує наймати найближчим часом\"') }}\n",
+            "monthly_turnover": "={{ $fromAI('monthly_turnover', 'Щомісячний оборот користувача у доларах, наприклад \\\"5200$\\\"') }}",
+            "user_chat_link": "={{ $('Merge1').first().json.client_username }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "business",
+              "displayName": "business",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "monthly_turnover",
+              "displayName": "monthly_turnover",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "team",
+              "displayName": "team",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "goals",
+              "displayName": "goals",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "recommended_product",
+              "displayName": "recommended_product",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "user_chat_link",
+              "displayName": "user_chat_link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        1904,
+        1568
+      ],
+      "id": "162d2dda-8def-49f2-82d2-01d491020501",
+      "name": "add_qualified_lead",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "KqPn7LBjWDfqBdFz",
+          "name": "Google Sheets OG"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## TODO: поменять айди\nна сергея\n\n### проверить\nскорее всего 17841401285847074",
+        "height": 288,
+        "width": 368,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -864,
+        1104
+      ],
+      "typeVersion": 1,
+      "id": "44601cb4-c0b0-4537-a573-5617a2351954",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        1104,
+        1552
+      ],
+      "id": "95a803e0-75da-4868-b035-3024d8ae5f28",
+      "name": "When chat message received",
+      "webhookId": "32be11cd-5f35-4c9c-9d94-16441da6d397"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2be36290-e90b-4e51-866f-a4ac2d6ccbea",
+              "name": "message",
+              "value": "={{ $json.chatInput }}",
+              "type": "string"
+            },
+            {
+              "id": "8d4da2a2-1438-4ae3-a51f-fc18480e070b",
+              "name": "fromID",
+              "value": "=test_{{ $json.sessionId }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1264,
+        1552
+      ],
+      "id": "6f3e5312-cb6c-471d-95a5-20244298aa10",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "function escapeMarkdownV2(text) {\n  return text.replace(/([_*\\[\\]()~`>#+\\-=|{}.!])/g, '\\\\$1')\n}\n\nreturn items.map(item => {\n  const data = item.json\n  const lines = []\n\n  // --- CONTACT INFO (Usually passed from Trigger) ---\n  \n  if (data.client_username && data.client_username !== 'unknown') {\n    const username = data.client_username.replace(/^@/, ''); \n    const profileUrl = `https://instagram.com/${username}`\n    // Creates a clickable link in Telegram Markdown\n    lines.push(`📱 Instagram: [@${username}](${profileUrl})`)\n  }\n\n  // --- QUALIFICATION DATA (From AI Agent) ---\n\n  // Niche \n  if (data.business && data.business !== 'unknown')\n    lines.push(`🏢 Business: ${data.business}`)\n\n  // Turnover \n  if (data.monthly_turnover && data.monthly_turnover !== 'unknown')\n    lines.push(`💰 Turnover: ${data.monthly_turnover}`)\n\n  // Team details \n  if (data.team && data.team !== 'unknown')\n    lines.push(`👥 Team: ${data.team}`)\n\n  // Goals/Problems \n  if (data.goals && data.goals !== 'unknown')\n    lines.push(`🎯 Goals: ${data.goals}`)\n\n  // Recommended Product [cite: 14, 15]\n  if (data.recommended_product && data.recommended_product !== 'unknown')\n    lines.push(`📦 Recommended: ${data.recommended_product}`)\n\n  // --- TRANSFER LOGIC ---\n\n  // Reason for transfer [cite: 11]\n  if (data.transfer_reason && data.transfer_reason.trim())\n    lines.push(`\\n⚠️ Transfer reason: ${data.transfer_reason}`)\n\n  return {\n    json: {\n      message: lines.join('\\n')\n    }\n  }\n})"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2384,
+        1440
+      ],
+      "id": "9fa220ab-7e81-42fc-add9-dcbd5856ef75",
+      "name": "Handoff Message1"
+    },
+    {
+      "parameters": {
+        "chatId": "-1003481815942",
+        "text": "={{ $json.message }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2608,
+        1440
+      ],
+      "id": "fea33a29-8dae-4a6e-b343-e66a59de2471",
+      "name": "Send Message To Group2",
+      "webhookId": "f50e57c1-2a67-4633-9b22-23bb30619d99",
+      "credentials": {
+        "telegramApi": {
+          "id": "RjFhbLnDMoH8VW2V",
+          "name": "AI Manager Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## serhii Instagram Token\n```\nEAAV8UjEiN4QBP3mAmQFoZArZAtXBkTKHh0fb5IpR6X9qVvVEoEspr5oIhjvMEHSgjcxV8DZB50ZBRoZAFBhUwIMhho0FLB58K08AQmgP9eAlPzidMClW75RQpyUkoGdSg801d1Pgn9ncZBafW9EzjZC2xvZByUajH6bNXzUzrHTIMlu6PwAuIArimTK8ZCF7smNjg3hQpEUDzegZDZD\n```",
+        "height": 256,
+        "width": 416,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1680,
+        848
+      ],
+      "typeVersion": 1,
+      "id": "75ed7b46-80b3-4eab-a566-971cab16bd31",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "serhii_consulting.ig"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1632,
+        1264
+      ],
+      "typeVersion": 1,
+      "id": "fce3d3ba-77a6-4a25-80e7-57ad0fe9d5a0",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "event",
+              "value": "ANSWERED_TO_CLIENT"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        2992,
+        1216
+      ],
+      "id": "7c3982db-8958-4d09-a031-118f4681ef58",
+      "name": "[LOG] Event ANSWERED_TO_CLIENT"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "event",
+              "value": "TRANSFERED_CLIENT"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        3392,
+        960
+      ],
+      "id": "9b564a82-08a9-4c28-aac0-1d1a089389d1",
+      "name": "[LOG] Event TRANSFERED_CLIENT"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.orbitalgarden.space",
+            "user-agent": "facebookexternalua",
+            "content-length": "485",
+            "accept": "*/*",
+            "accept-encoding": "deflate, gzip",
+            "content-type": "application/json",
+            "facebook-api-version": "v24.0",
+            "via": "1.1 Caddy",
+            "x-forwarded-for": "173.252.79.2",
+            "x-forwarded-host": "n8n.orbitalgarden.space",
+            "x-forwarded-proto": "https",
+            "x-hub-signature": "sha1=5629ef3a79136bf609ebf84cd279bddb6546fcde",
+            "x-hub-signature-256": "sha256=80659fc7d6c847636e5ed533c07c22db0a75928296a5b087012499864ba83f0b"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "object": "instagram",
+            "entry": [
+              {
+                "time": 1761203780377,
+                "id": "17841456702884465",
+                "messaging": [
+                  {
+                    "sender": {
+                      "id": "1179247697399594"
+                    },
+                    "recipient": {
+                      "id": "17841456702884465"
+                    },
+                    "timestamp": 1761203779511,
+                    "message": {
+                      "mid": "aWdfZAG1faXRlbToxOklHTWVzc2FnZAUlEOjE3ODQxNDU2NzAyODg0NDY1OjM0MDI4MjM2Njg0MTcxMDMwMTI0NDI1OTk5ODc3MjU5Mjc3OTYxMTozMjQ4ODQ3NTM4MjMwNDU4NDc0NjUzMzAwMDcwMDc1NTk2OAZDZD",
+                      "text": "Может завтра в 9 вечера?"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "webhookUrl": "https://n8n.orbitalgarden.space/webhook/wowlaser.ig",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Parse to JSON1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Source": {
+      "main": [
+        [
+          {
+            "node": "Message Data1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Data": {
+      "main": [
+        [
+          {
+            "node": "Valid?1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Source",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Valid?1": {
+      "main": [
+        [
+          {
+            "node": "mid",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Should answer?1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Transfer?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message Data1": {
+      "main": [
+        [
+          {
+            "node": "HandleMessageStack",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse to JSON1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Should answer?1": {
+      "main": [
+        [
+          {
+            "node": "Send Message Reply1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transfer?": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Upsert Clients",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Handoff Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET IG User": {
+      "main": [
+        []
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Handoff Message": {
+      "main": [
+        [
+          {
+            "node": "Send Message To Group",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HandleMessageStack": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TEST JSON": {
+      "main": [
+        [
+          {
+            "node": "TEST",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "mid": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Duplicate?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Duplicate?": {
+      "main": [
+        [
+          {
+            "node": "Stop",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge3": {
+      "main": [
+        [
+          {
+            "node": "Supabase",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "add_qualified_lead": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Handoff Message1": {
+      "main": [
+        [
+          {
+            "node": "Send Message To Group2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Message Reply1": {
+      "main": [
+        [
+          {
+            "node": "[LOG] Event ANSWERED_TO_CLIENT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Message To Group": {
+      "main": [
+        [
+          {
+            "node": "[LOG] Event TRANSFERED_CLIENT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/New_York",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "6fbe3775-cc5b-4999-8378-5382be05e64e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c9e53a150db3979558dce85b88732650eafd440e09b4690afc30683da1136ad9"
+  },
+  "id": "QO4WrknNhQfxim1x",
+  "tags": [
+    {
+      "createdAt": "2025-10-29T17:09:52.649Z",
+      "updatedAt": "2025-10-29T17:09:52.649Z",
+      "id": "hcmv4AsIBvrEdV4f",
+      "name": "INSTA"
+    },
+    {
+      "createdAt": "2025-09-14T12:25:31.358Z",
+      "updatedAt": "2025-09-14T12:25:31.358Z",
+      "id": "oi3mfeDHd8seIZYf",
+      "name": "latest"
+    }
+  ]
+}
