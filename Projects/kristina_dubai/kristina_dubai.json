@@ -1,0 +1,3148 @@
+{
+  "name": "kristina_dubai",
+  "nodes": [
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {
+          "responseFormat": "json_object"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -2032,
+        1040
+      ],
+      "id": "96a5f494-7d66-4745-9ae4-e2cad6a76fc0",
+      "name": "OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "kxH60aJwWWGZzBaI",
+          "name": "Gosha GPT Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "if (\n  !items ||\n  !items.length ||\n  items.every(item => Object.keys(item.json || {}).length === 0)\n) {\nreturn [{ json: { chat_history: '' } }]\n}\n\nconst formatted = items.map(item => {\n  //const sender = item.json.sender === 'bot' ? 'Assistant' : 'Client'\n  return `${item.json.sender}: ${item.json.message}`\n}).join('\\n')\n\nconst lastMessage = items\n  .sort((a, b) => new Date(b.created_at) - new Date(a.created_at)) // insted of reverse\n  // .reverse()\n  .find(item => item.json.sender === 'Client')\n\n// const lastMessageFormatted = lastMessage \n//   ? `${lastMessage.json.sender}: ${lastMessage.json.message}`\n//   : ''\n\n// return [{ json: { chat_history: formatted, last_message: lastMessageFormatted } }]\nreturn [{ json: { chat_history: formatted } }]\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2496,
+        624
+      ],
+      "id": "e58b9949-2c9c-4a44-ad4f-be6c63eb91a8",
+      "name": "Chat History String"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n        \"client_id\": {\n          \"type\": \"string\"\n        },\n\t\t\"message\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n\t\t\"qualification_done\": {\n\t\t\t\"type\": \"boolean\"\n\t\t},\n        \"client_type\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n        \"payment\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n        \"knows_property\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n        \"intent\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n        \"current_block\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n        \"summary\": {\n            \"type\": \"string\"\n        },\n        \"reasoning\": {\n          \"type\": \"string\"\n        }\n\t}\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -1776,
+        1040
+      ],
+      "id": "227761bc-de60-48fc-9547-5b9933507116",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0312def6-af7b-49a7-bf78-0ba01ca99b5e",
+              "leftValue": "={{ $('AI Agent').first().json.output.qualification_done }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -816,
+        864
+      ],
+      "id": "bf955dde-0769-430c-97b5-79da31bafba7",
+      "name": "Client Qualified"
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -1344,
+        480
+      ],
+      "id": "91526e87-2499-4b52-a0f9-f38403484db8",
+      "name": "Wait",
+      "webhookId": "f836aebb-ec5b-43e4-a020-d09c05034938"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('ENV Variables').first().json.is_test \n  ? $('ENV Variables').first().json.supabase_clients_url_test\n  : $('ENV Variables').first().json.supabase_clients_url\n}}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "phone_number",
+              "value": "=eq.{{ $('Client Metadata').first().json.phone_number }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -4256,
+        800
+      ],
+      "id": "93f04b0a-4cd4-4082-847c-99da09e1c9c2",
+      "name": "Get Client",
+      "alwaysOutputData": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "FAFnBfYyqTLXDpjY",
+          "name": "Kristina Dubai Supabase Auth Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ Object.keys($json).length }}",
+                    "rightValue": 0,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    },
+                    "id": "f47b8f45-be65-48ea-a9c4-32d250b1a71d"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Does not exist"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a69fb4bc-80d1-4fd6-8ecb-ba0087194139",
+                    "leftValue": "={{ $json.qualification_done }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "false",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Not Qualified"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b5cbc6f9-d96d-4b84-9305-8736cc7d1226",
+                    "leftValue": "={{ $json.qualification_done }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Qualified"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -4048,
+        784
+      ],
+      "id": "17fb5da5-9761-4416-93f7-2d39bb7f140f",
+      "name": "Check Client"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('ENV Variables').first().json.is_test \n  ? $('ENV Variables').first().json.supabase_clients_url_test\n  : $('ENV Variables').first().json.supabase_clients_url\n}}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={\n  \"phone_number\": \"{{ $('Client Metadata').first().json.phone_number }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -3840,
+        672
+      ],
+      "id": "ed56729c-235b-4c71-aece-4b23abb61585",
+      "name": "Create Client",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "FAFnBfYyqTLXDpjY",
+          "name": "Kristina Dubai Supabase Auth Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6ee4a9d0-cd05-49a4-8883-3f7a589d4dfc",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "8f1b83db-edcd-4161-b3ac-3252c3de9834",
+              "name": "phone_number",
+              "value": "={{ $json.phone_number }}",
+              "type": "string"
+            },
+            {
+              "id": "5562e645-8076-4c52-a9a9-0ccc8329e999",
+              "name": "message",
+              "value": "={{ $('Client Metadata').first().json.message }}",
+              "type": "string"
+            },
+            {
+              "id": "f32b020e-22e5-4265-9426-e74babf6b38c",
+              "name": "timestamp",
+              "value": "={{ $('Client Metadata').first().json.timestamp }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3648,
+        800
+      ],
+      "id": "006ad1cd-6253-480d-a682-0da3183773cd",
+      "name": "Client Data"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('ENV Variables').first().json.is_test \n  ? $('ENV Variables').first().json.supabase_messages_url_test\n  : $('ENV Variables').first().json.supabase_messages_url\n}}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "client_id",
+              "value": "=eq.{{ $('Client Data').first().json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2688,
+        800
+      ],
+      "id": "a456dff4-8d54-4492-9211-54276e59271f",
+      "name": "Get Chat Messages",
+      "alwaysOutputData": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "FAFnBfYyqTLXDpjY",
+          "name": "Kristina Dubai Supabase Auth Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('ENV Variables').first().json.is_test \n  ? $('ENV Variables').first().json.supabase_messages_url_test\n  : $('ENV Variables').first().json.supabase_messages_url\n}}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={\n  \"client_id\": \"{{ $('Client Data').first().json.id }}\",\n  \"sender\": \"Client\",\n  \"message\": {{ JSON.stringify($json.text) }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2000,
+        528
+      ],
+      "id": "0e6289b8-e4a4-45c5-b7b5-44697147f03c",
+      "name": "Add Client Message",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "FAFnBfYyqTLXDpjY",
+          "name": "Kristina Dubai Supabase Auth Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ $('ENV Variables').first().json.is_test \n  ? $('ENV Variables').first().json.supabase_clients_url_test\n  : $('ENV Variables').first().json.supabase_clients_url\n}}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "id",
+              "value": "=eq.{{ $('Client Data').first().json.id }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={\n{{ ($json.output.qualification_done ? '\"qualification_done\": true,' : '') }}\n  \"last_message_at\": \"{{ $now.toISO() }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1168,
+        480
+      ],
+      "id": "d7c993a1-94f0-4185-9ee1-a79e56d4c116",
+      "name": "Update Client",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "FAFnBfYyqTLXDpjY",
+          "name": "Kristina Dubai Supabase Auth Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('ENV Variables').first().json.is_test \n  ? $('ENV Variables').first().json.supabase_messages_url_test\n  : $('ENV Variables').first().json.supabase_messages_url\n}}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={\n  \"client_id\": \"{{ $('Client Data').first().json.id }}\",\n  \"sender\": \"Assistant\",\n  \"message\": \"{{ $json.output.message }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1344,
+        608
+      ],
+      "id": "9d837fc2-d9a0-46a0-bc80-cac888454592",
+      "name": "Add Assistant Message",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "FAFnBfYyqTLXDpjY",
+          "name": "Kristina Dubai Supabase Auth Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('ENV Variables').first().json.upstash_base_url }}/pipeline",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "=[\n  [\"rpush\", \"chat-buffer-{{ $('Client Data').first().json.phone_number }}\", {{ JSON.stringify($json.message) }}],\n  [\"expire\", \"chat-buffer-{{ $('Client Data').first().json.phone_number }}\", \"{{ $('ENV Variables').first().json.upstash_messages_stack_ttl ?? 30 }}\"]\n]\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -3248,
+        640
+      ],
+      "id": "31382ff9-642e-4f32-902d-f5efd606dbd8",
+      "name": "Add to Messages Stack",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "BfV7pnbm9L2uaLya",
+          "name": "Upstash Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $('ENV Variables').first().json.upstash_base_url }}/lrange/chat-buffer-{{ $('Client Data').first().json.phone_number }}/0/-1",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -3072,
+        800
+      ],
+      "id": "7b44d429-5f91-4c73-a683-d5ccc90abf63",
+      "name": "Get Latest Message Stack",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "BfV7pnbm9L2uaLya",
+          "name": "Upstash Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "f0746901-e813-4eab-a3c8-7b43368c4400",
+              "leftValue": "={{ $('Get Latest Message Stack').first().json.result.length === 0 }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "ec39573f-f92a-4fe4-a832-0a137de8e7d0",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "leftValue": "={{ $('Get Latest Message Stack').first().json.result.last() }}",
+              "rightValue": "={{ $('Client Data').first().json.message }}"
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "id": "532bcc27-39a2-4ad1-8da8-2497e4854ac9",
+      "name": "Should Continue?",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        -2896,
+        800
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "content": "## Retrieve Client data from Supabase\n* Get client by phone number\n* Create if not exists, end workflow if qualified\n* Form 'Client Data' node for easy access to essential data ",
+        "height": 624,
+        "width": 816,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -4288,
+        576
+      ],
+      "typeVersion": 1,
+      "id": "74bb3553-968c-49ea-8717-1b7440d010a8",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f2a84784-9164-4815-9395-0eefc8398f28",
+              "leftValue": "={{ $('Message Received').first().json.body.data.meta.isGroup }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "2acf4a18-4088-4293-ba22-b0983a02e7b5",
+              "leftValue": "={{ $('Message Received').first().json.body.data.fromNumber }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "53821d8b-d218-4f16-ad63-ffb2aef08960",
+              "leftValue": "={{ $('Message Received').first().json.body.data.body }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -4720,
+        880
+      ],
+      "id": "203efdeb-898c-4622-8ddd-bcacdd426fdc",
+      "name": "Valid?",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "var messageStack = $('Get Latest Message Stack').first().json.result\n\nif (\n  !items ||\n  !items.length ||\n  items.every(item => Object.keys(item.json || {}).length === 0)\n) {\n  \n  // No history - return the whole stack\n  return [\n    { \n      json: { \n        text: messageStack.join('. ') \n      } \n    }\n  ]\n}\n\n// Get latest Client message\nconst lastClientMessage = items\n  .sort((a, b) => new Date(b.json.created_at) - new Date(a.json.created_at))\n  .find(item => item.json.sender === 'Client')\n\n// Start Index = index of the latest Client message from the history + 1\nconst startIdx = messageStack.lastIndexOf(lastClientMessage) + 1\n\n// We want to slice from startIdx all the way to the last message in stack\nconst endIdx = messageStack.length\n\nconst messageBuffer = messageStack.slice(startIdx, endIdx).join('. ')\n\nreturn [\n  {\n    json: {\n      text: messageBuffer\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2496,
+        800
+      ],
+      "id": "61a642d3-3750-4631-9c60-965ac6a7eba9",
+      "name": "Get Messages Buffer"
+    },
+    {
+      "parameters": {
+        "content": "## Handle many messages in a row\nStagger an AI Agent's reply if users often send in a sequence of partial messages and in short bursts.\n\n* Webhook's message is recorded in a message stack powered by Redis.\n* The execution is immediately paused for 15 seconds and then another check is done against the message stack for the latest message.\n* The purpose of this check lets use know if the user is sending more messages or if they are waiting for a reply.\n* The execution is aborted if the latest message on the stack differs from the incoming message and continues if they are the same.\n* For the latter, the agent receives buffered messages and is able to respond to all in a single reply.",
+        "height": 800,
+        "width": 1104,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -3392,
+        432
+      ],
+      "typeVersion": 1,
+      "id": "a8643116-db44-4915-b43f-acb0288ac0f8",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "jsCode": "const formatForWhatsApp = ({ client_id, client_type, payment, knows_property, intent, summary }) => {\n  return `1. *Client Type*: ${capitalize(client_type)}\\n2. *Payment*: ${capitalize(payment)}\\n3. *Knows The Property*: ${capitalizeYesNo(knows_property)}\\n4. *Intent*: ${capitalize(intent)}\\n5. *Summary*: ${summary}\\n6. *Chat*: https://wa.me/${client_id}`\n}\n\nconst capitalize = str => str.charAt(0).toUpperCase() + str.slice(1)\nconst capitalizeYesNo = str => str === 'yes' ? 'Yes' : str === 'no' ? 'No' : capitalize(str)\n\nconst message = formatForWhatsApp($('AI Agent').first().json.output)\n\nreturn [{message: message}]\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -608,
+        928
+      ],
+      "id": "269fae3b-5651-468d-a6ab-16c9ab864e93",
+      "name": "Create Qualification Message"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.wassenger.com/v1/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Token",
+              "value": "5b6a656367492cf458c91ca0ba88b125409419fa4a956848528326a64d268c00b5647ccbb851986c"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={\n  \"phone\": \"{{ $('Client Data').first().json.phone_number }}\",\n  \"message\": \"{{ $json.output.message }}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1568,
+        1152
+      ],
+      "id": "d0f451bf-1cff-42db-8f61-f3078ea66924",
+      "name": "Send Message To Client"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -816,
+        1024
+      ],
+      "id": "77399f94-b855-454d-8036-36330133f71d",
+      "name": "No Operation, do nothing3"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Get Messages Buffer').first().json.text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are a female real estate assistant based in Dubai.\nYour goal is to qualify clients interested in buying property by following a structured conversation flow.\n\n📌 Output Schema\nAlways respond only with valid JSON matching this schema\n{\n  \"client_id\": \"{{ $('Client Data').first().json.phone_number }}\", \n  \"message\": \"Message reply to the client\",\n  \"qualification_done\": true,\n  \"summary\": \"Brief summary of the qualification\",\n  \"client_type\": \"unknown\",\n  \"payment\": \"cash\",\n  \"knows_property\": \"no\",\n  \"intent\": \"interested\",\n  \"off_topic_redirect\": true,\n  \"reasoning\": \"List of conclusions of internal reasoning by number\"\n}\nField rules:\n- message — the assistant’s visible reply to the user.\n- qualification_done — true only when qualification is completed.\n- summary — a short description of completed stages.\n- client_type — client type (buyer/agent/unknown).\n- payment — payment type (cash/mortgage/unknown)\n- knows_property — if the client knows property (yes/no/unknown) \n- intent — just asking/interested/ready/unknown\n- reasoning — answer to each question desctibed inside internal reasoning requirement. \n- Always include all fields, even if empty (\"message\": \"\").\n\n🧾 CHAT HISTORY CONTEXT\nUse the following chat history for all context-based decisions:\n{{ $('Chat History String').first().json.chat_history }}\n\n📌 Behavior Rules\n- Always use feminine form and pronouns in self-reference.\n- Never fabricate information or assumptions.\n- If the user's answer does not explicitly map to one of the valid options for the current step, DO NOT guess or assume. You must ask the user to clarify.\n- Always answer in the same language as user is using in their last message (English, Russian, etc.).\n- Do not use the word “qualification” in your replies (internal term only).\n- If the user provides multiple pieces of information at once (e.g., “I am buying for myself, cash, and yes I know the building”), process ONLY the next required step. Do not jump ahead.\n\n📌 INTERNAL REASONING REQUIREMENT (Chain of Thought — hidden)\nBefore generating every reply, you must silently perform an internal reasoning step:\n1. Identify the user's Persona (Agent vs. Buyer) and Payment Method from history.\n2. Identify the *Last Completed Step* number.\n3. identifying the *Next Required Step* number based strictly on the Qualification Flow.\n4. Check for missing information required by the *Next Required Step*.\n5. Off-topic check: Is the user answering the last question or asking something unrelated?\n6. DECISION ON COMPLETION (Critical):\n   - Look at the *Next Required Step* identified in reasoning point #3.\n   - IF the Next Step is anything other than \"Step 7\", then qualification_done MUST be FALSE.\n   - IF the Next Step is \"Step 7\", then qualification_done is TRUE.\n   - NEVER decide to finish based on \"feeling\" you have enough info. You must follow the step numbers.\n\n📌 Qualification Flow\n1. Ask if the user is looking for themselves or representing a client.\n   - If they’re an agent (representing someone else in any form) → go to Step 3.\n   - If for themselves → continue to Step 2.\n2. Ask if they are familiar with the building.\n   - If not familiar → Reply exactly: \"No problem - I’ll send you the full presentation shortly.\" then immediately append the question from Step 3.\n   - If familiar → go to Step 3.\n3. Ask about their/their client's payment method — cash or mortgage.\n   - If cash:\n     a. If they are looking for themselves → go to Step 7.\n     b. If they are an agent → go to Step 3.1.\n   - If mortgage → continue to Step 4 (for both agent and self-use buyers).\n3.1. Ask if their client is an investor or looking for themselves.\n   - Once the answer is received, finish qualification (Step 7).\n4. Ask if they/their client have been pre-approved by a bank.\n   - If yes → go to Step 5.\n   - If no → go to Step 7.\n5. Inform them about mortgage limits.\n   - Reply exactly: \"Just so you know - mortgages for off-plan properties typically cover only around 50% of the value - the rest must be paid upfront. Would that work for you?\"\n   - (Or \"Would that work for your client?\" if user is an agent).\n6. Once confirmed, finish qualification (Step 7).\n7. Step 7 — Finish Qualification: mark qualification_done true and close the interaction gracefully.\n   - If the user is looking for themselves → Reply exactly: \"Let me double-check a few things and I’ll get back to you shortly.\"\n   - If the user is an agent → Reply exactly: \"Got it. I’ll double-check a couple of details, but meanwhile take a look at my property list below. Maybe something works for your other clients. Viewings anytime.\"\n\n📌 Handling Off-Topic Replies\nIf the user’s message is unrelated to your current question or involves information you’re not equipped to provide:\n- If they ask whether the property is available: confirm availability, then continue from the last unanswered step.\n- If they ask any other unrelated or knowledge-based question:\n  1. Check Chat_History for the keyword: \"off_topic_redirect\"\n  2. If not found: send \"I'll provide all the details shortly.\", then immediately repeat your previous question.\n  3. If found, this is the second off-topic reply. Stop the qualification process and proceed to Step 7 — Finish Qualification.\n- If you redirect the user back to the main flow (after handling an off-topic question), append the marker `off_topic_redirect` at the very end of \"message\" in your JSON response.\n\n🗣️ STYLE AND LANGUAGE CONTROL\n- Do not invent new expressions, exclamations, or openings (e.g., avoid “Alright!”, “Okay!”, “Sure thing!”, “Sounds good!”).\n- Use a direct, neutral, business-like tone.\n- Do NOT use polite softening phrases such as “may I”, “could you”, “would you”, “please”, “let me know”, “kindly”, “if you don’t mind”, or similar forms.\n- All questions must be direct statements, e.g., “Are you planning to pay with cash or mortgage?”\n- Avoid unnecessary courtesy.\n\n\n📌 EXAMPLE DIALOG PATTERNS (Do NOT output or reveal)\nYou must follow these patterns:\n1. AGENT + CASH\n   - Greet → Ask “yourself or agent?”\n   - If agent → Ask their client's payment method.\n   - If cash → Ask: “Is the client an investor or buying for personal use?”\n   - After answer → Close with: \n     “Okay, I’ll clarify a couple of details and get back to you. In the meantime, you can look at the other listings. Maybe something will interest you for your other clients. Showings are available at any time.”\n2. AGENT + MORTGAGE\n   - Same initial steps.\n   - If mortgage → Ask about bank pre-approval.\n   - If pre-approved → Say EXACT required mortgage disclaimer.\n   - After confirmation → Use the same agent closing message as above.\n3. BUYER + MORTGAGE\n   - Ask “yourself or agent?”\n   - If buyer → Ask familiarity with the building.\n   - If familiar → Ask payment method.\n   - If mortgage → Ask bank pre-approval.\n   - If yes → Say EXACT required mortgage disclaimer.\n   - After confirmation → Close with:\n     “Let me double-check a few things and I’ll get back to you shortly.”\n4. BUYER + CASH\n   - Same initial steps.\n   - If cash → Immediately use the same buyer closing message.\n5. SPECIAL CASES\n   - If NOT familiar with building:\n     Respond EXACTLY:\n     “No problem - I’ll send you the full presentation shortly.”\n     Then proceed to payment question.\n   - First off-topic question:\n     Respond:\n     “I’ll provide all the details shortly,”\n     Then repeat the current question.\n     Add the marker `off_topic_redirect` at the end of the message.\n   - Second off-topic question:\n     Respond EXACTLY:\n     “Just a minute, let me check this”\n     Then proceed to Step 7 (finish).\n\nSTYLE RULES LEARNED FROM EXAMPLES:\n- Very short replies.\n- No enthusiasm or filler expressions.\n- Neutral, calm, business-like tone.\n- Each message contains only one action (one question or one note).\n- Always mirror user’s language.\nBut the step number must ALWAYS follow the Qualification Flow section — examples never override the logic.\n\nLOGIC PRIORITY:\n1. Output Schema rules\n2. Qualification Flow\n3. Off-topic rules\n4. Example Dialog Patterns\n5. Style rules\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        -2000,
+        800
+      ],
+      "id": "a2eb1e4b-fe48-4b69-9519-2a3d67764787",
+      "name": "AI Agent",
+      "alwaysOutputData": false,
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "43530d47-21b2-4325-a425-0e267c23c97d",
+              "name": "is_test",
+              "value": "={{ $json.is_test }}",
+              "type": "boolean"
+            },
+            {
+              "id": "3a0f2b30-a97d-43a1-b9d0-29288a27b71e",
+              "name": "supabase_clients_url",
+              "value": "https://fybqwzsdoqcucdtxhlla.supabase.co/rest/v1/clients",
+              "type": "string"
+            },
+            {
+              "id": "8ad6d322-69fe-41fe-8ac4-7f7110579e45",
+              "name": "supabase_messages_url",
+              "value": "https://fybqwzsdoqcucdtxhlla.supabase.co/rest/v1/chat_messages",
+              "type": "string"
+            },
+            {
+              "id": "629ef0c0-bdcb-4167-a636-c3c830d8f45c",
+              "name": "supabase_clients_url_test",
+              "value": "https://fybqwzsdoqcucdtxhlla.supabase.co/rest/v1/test_clients",
+              "type": "string"
+            },
+            {
+              "id": "da119127-6ac5-480a-92d5-e92acebffbbb",
+              "name": "supabase_messages_url_test",
+              "value": "https://fybqwzsdoqcucdtxhlla.supabase.co/rest/v1/test_messages",
+              "type": "string"
+            },
+            {
+              "id": "fa179b5b-c758-4254-828b-1335133b64a4",
+              "name": "upstash_base_url",
+              "value": "=https://intent-guinea-6714.upstash.io",
+              "type": "string"
+            },
+            {
+              "id": "109ed271-74b2-4036-b38e-708700bc2e45",
+              "name": "upstash_messages_stack_ttl",
+              "value": "={{ $json.is_test ? 10 : 115 }}",
+              "type": "string"
+            },
+            {
+              "id": "5b9b6c90-0dae-47e6-9803-4c14782beb02",
+              "name": "manager_group_id",
+              "value": "120363419887584150@g.us",
+              "type": "string"
+            },
+            {
+              "id": "7deca1f1-923c-423f-88dd-a3715e3cd72b",
+              "name": "manager_phone",
+              "value": "=971585609763",
+              "type": "string"
+            },
+            {
+              "id": "4aad1a28-781b-4040-beff-47e03a34d8dd",
+              "name": "wasender_api_key",
+              "value": "={{ $json.is_test ? 'Bearer a1ce08457c8ae054d4ff2849f61141ad3af71639a1663825a5fa1bb4c7bd3a0a' : 'Bearer 31f80b7c5666626556ae8960357445868e2bc15b8530c964663e7cf8565e618c' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -5392,
+        784
+      ],
+      "id": "982d6815-fbfc-4162-b34a-a6fa15385e4d",
+      "name": "ENV Variables"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -3984,
+        992
+      ],
+      "id": "afc38b11-33e8-4258-a3e3-872baf76f5d1",
+      "name": "Client Is Already Qualified"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -4528,
+        944
+      ],
+      "id": "4871d436-a743-481a-8d24-a18e992771da",
+      "name": "Invalid input data"
+    },
+    {
+      "parameters": {
+        "content": "## Setting up test environment\n1. Disable \"WasenderAPI Message\" mode\n2. Enable \"WasenderAPI Test Message\" node\n3. DONE",
+        "height": 192,
+        "width": 416,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -8128,
+        672
+      ],
+      "typeVersion": 1,
+      "id": "83e2b190-4aac-4f10-a4e3-98a1cb983090",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -2864,
+        976
+      ],
+      "id": "a814068b-6ea4-4253-8b8e-160db38a6e5d",
+      "name": "Client sent another message, stop execution"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a0805f38-0e68-48c5-88d9-5759c8e4863d",
+              "leftValue": "={{ $('ENV Variables').first().json.is_test }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -5088,
+        784
+      ],
+      "id": "f9208a2a-a0a6-4903-82dc-92f370dad55b",
+      "name": "Is Test?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a0805f38-0e68-48c5-88d9-5759c8e4863d",
+              "leftValue": "={{ $('ENV Variables').first().json.is_test }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1248,
+        784
+      ],
+      "id": "bbf4a436-63a2-474c-9032-836d8cbff70a",
+      "name": "Is Test?1"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "916e2b7f-bb9e-4018-8d3f-1c83b4eff89d",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -6496,
+        176
+      ],
+      "id": "c945ecae-eafe-4e62-85bb-a54df8f7862a",
+      "name": "Message Received",
+      "webhookId": "916e2b7f-bb9e-4018-8d3f-1c83b4eff89d",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8833cfc3-9dda-4940-8582-145f55d7d572",
+              "leftValue": "={{ $('Message Received').first().json.body.data.fromNumber }}",
+              "rightValue": "998934621498",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -6272,
+        176
+      ],
+      "id": "8ed07177-3886-4b23-a787-e9aed4a56e65",
+      "name": "Prod test If"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8833cfc3-9dda-4940-8582-145f55d7d572",
+              "leftValue": "={{ $('Message Received').first().json.body.data.fromNumber.replace(/^\\+/, '') }}",
+              "rightValue": "998934621498",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "bc7fd94a-a78e-4456-9ce2-4ff73d7c1716",
+              "leftValue": "={{ $('Message Received').first().json.body.data.fromNumber.replace(/^\\+/, '') }}",
+              "rightValue": "380963236071",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -6096,
+        176
+      ],
+      "id": "2e6b983d-1743-4b06-86a7-79eff521b002",
+      "name": "Prod test If1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f963525b-bfcb-4c42-8579-50155ff81786",
+              "leftValue": "={{ $json.output.keys().length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1648,
+        800
+      ],
+      "id": "eaec0392-fd58-483c-ae9f-49d1e3ac4a59",
+      "name": "Output Not Empty?"
+    },
+    {
+      "parameters": {
+        "content": "## VERSION\n1. Create a copy of workflow\n2. Add changes there\n3. Test using test env\n4. **Set Webhook's route**\n5. Disable previous workflow\n6. Enable new version",
+        "height": 224,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -8464,
+        672
+      ],
+      "typeVersion": 1,
+      "id": "6d58271c-5047-4f89-823f-a74651f918e6",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "amount": "={{ $('ENV Variables').first().json.is_test ? 5 : 110 }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -3248,
+        800
+      ],
+      "id": "6b4eb837-f677-4467-8277-6ce06893ff3e",
+      "name": "Wait 100 seconds",
+      "webhookId": "7211da6a-d6cb-4d93-8bc2-0e7e6e9997f7"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8cb89a6a-240b-48fe-8d54-a47243fec2e0",
+              "leftValue": "={{ $('Gupsup Message').first().json.body.entry[0].changes[0].value.contacts[0].wa_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "71243fb1-7d37-4214-bb31-55956adeda22",
+              "leftValue": "={{ $('Gupsup Message').first().json.body.entry[0].changes[0].value.messages[0].text.body }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -6912,
+        176
+      ],
+      "id": "f4ac2577-4e56-4289-8a0f-965fde421f13",
+      "name": "Valid Gupshup Message?"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "d7bb1f08-8e6d-4ac6-b6ec-0fca2715c459",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -7088,
+        176
+      ],
+      "id": "e5946699-2e80-46c8-a539-e880edf35dd8",
+      "name": "Gupsup Message",
+      "webhookId": "d7bb1f08-8e6d-4ac6-b6ec-0fca2715c459",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "30c74198-3cb5-4608-a8d5-a86e5533b67b",
+              "name": "phone_number",
+              "value": "={{ $('Gupsup Message').first().json.body.entry[0].changes[0].value.contacts[0].wa_id }}",
+              "type": "string"
+            },
+            {
+              "id": "91b4f2ff-31ea-49bc-b034-196bcc1acfb4",
+              "name": "message",
+              "value": "={{ $('Gupsup Message').first().json.body.entry[0].changes[0].value.messages[0].text.body }}",
+              "type": "string"
+            },
+            {
+              "id": "d504bba8-abb0-4a2d-8bc6-f3bfdc104673",
+              "name": "timestamp",
+              "value": "={{ $('Gupsup Message').first().json.body.entry[0].changes[0].value.messages[0].timestamp }}",
+              "type": "string"
+            },
+            {
+              "id": "9427b9d1-e7fc-447f-9aad-f49dd007b260",
+              "name": "is_group",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "ff36c1fd-831c-482e-b9ef-88d1bd68c732",
+              "name": "group_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "baff30d2-9a74-4dfc-b80e-b4807538dc80",
+              "name": "is_test",
+              "value": true,
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -6736,
+        176
+      ],
+      "id": "9be55ee6-7196-44d7-a4b7-bd8c978a9d61",
+      "name": "Gupshup Metadata"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.gupshup.io/wa/api/v1/msg",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "sk_2156c4ade66447249f5b2a862d9d58bc"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/x-www-form-urlencoded"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "source",
+              "value": "94743353842"
+            },
+            {
+              "name": "src.name",
+              "value": "REDstone"
+            },
+            {
+              "name": "destination",
+              "value": "={{ $('Client Data').first().json.phone_number }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ $json.output.message }}"
+            },
+            {
+              "name": "channel",
+              "value": "whatsapp"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -832,
+        432
+      ],
+      "id": "35fb316e-e1d8-411b-a0ca-a30ff5397000",
+      "name": "Send Gupshup Message"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2acf4a18-4088-4293-ba22-b0983a02e7b5",
+              "leftValue": "={{ \n  $json.body.data.messages.remoteJid.match(/^(\\+?\\d+)(@s\\.whatsapp\\.net)$/)\n  ?? $json.body.data.messages.remoteJid.match(/^\\d+@g\\.us$/)\n  ?? $json.body.data.messages.remoteJid.match(/^(\\+?\\d+)(@lid)$/)\n  ?? [] \n}}",
+              "rightValue": "",
+              "operator": {
+                "type": "array",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -6640,
+        784
+      ],
+      "id": "f121a52d-f5d4-464b-9bea-1735900d38e9",
+      "name": "Valid Wassenger Message?"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8f1b83db-edcd-4161-b3ac-3252c3de9834",
+              "name": "phone_number",
+              "value": "={{ (() => {\n  const cleanedSenderPn = $('Message').first().json.body.data.messages.key.cleanedSenderPn;\n  const jid = $('Message').first().json.body.data.messages.remoteJid;\n  const m = jid.match(/^(\\+?\\d+)(@s\\.whatsapp\\.net|@lid)$/);\n  if (!m) return null;\n\n  const res = m[2] === '@lid' ? m[1] + m[2] : m[1];\n// those are already stored in supabase with @lid format\n  const exceptions = ['167877957148828@lid', '144684596883503@lid', '145217760030909@lid', '56595102843067@lid'];\n\n  if (!cleanedSenderPn || exceptions.includes(res)) {\n    return res;\n  }\n\n  return cleanedSenderPn;\n})() }}",
+              "type": "string"
+            },
+            {
+              "id": "5562e645-8076-4c52-a9a9-0ccc8329e999",
+              "name": "message",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "f32b020e-22e5-4265-9426-e74babf6b38c",
+              "name": "timestamp",
+              "value": "={{ $('Message').first().json.body.data.messages.messageTimestamp }}",
+              "type": "string"
+            },
+            {
+              "id": "2faa1796-dbed-46b5-b1ff-2383184d9c2c",
+              "name": "is_group",
+              "value": "={{ !!$('Message').first().json.body.data.messages.remoteJid.match(/^\\d+@g\\.us$/) ?? false }}",
+              "type": "boolean"
+            },
+            {
+              "id": "9483a99d-5f99-4dec-b0b8-a3d937a0949f",
+              "name": "group_id",
+              "value": "={{ (() => {\n    const m = $('Message').first().json.body.data.messages.remoteJid.match(/^\\d+@g\\.us$/)\n    return m ? m[0] : null\n  })()  }}",
+              "type": "string"
+            },
+            {
+              "id": "d3f0c653-afd2-421f-b96d-e5beb81b938f",
+              "name": "is_test",
+              "value": "={{ $('Message').first().json.webhookUrl && $('Message').first().json.webhookUrl.includes('test') }}",
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -5904,
+        784
+      ],
+      "id": "f0875cba-8a72-4672-8a0f-025330b6eb83",
+      "name": "Wassenger Metadata"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "kristina_dubai",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -7024,
+        896
+      ],
+      "id": "3a819aaf-0bf4-4009-a2b6-72479e6d8453",
+      "name": "WasenderAPI Message",
+      "webhookId": "d6a1994a-f99c-4145-b776-e52cb3183b06"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "30c74198-3cb5-4608-a8d5-a86e5533b67b",
+              "name": "phone_number",
+              "value": "={{ $json.phone_number }}",
+              "type": "string"
+            },
+            {
+              "id": "91b4f2ff-31ea-49bc-b034-196bcc1acfb4",
+              "name": "message",
+              "value": "={{ $json.message }}",
+              "type": "string"
+            },
+            {
+              "id": "d504bba8-abb0-4a2d-8bc6-f3bfdc104673",
+              "name": "timestamp",
+              "value": "={{ $json.timestamp }}",
+              "type": "string"
+            },
+            {
+              "id": "e3c16359-3a83-4c3b-b281-8335666605c8",
+              "name": "is_group",
+              "value": "={{ $json.is_group }}",
+              "type": "boolean"
+            },
+            {
+              "id": "e4c81f87-f693-4053-992d-49fb5004f70d",
+              "name": "group_id",
+              "value": "={{ $json.group_id }}",
+              "type": "string"
+            },
+            {
+              "id": "bc388183-3727-4fb1-a2a0-5c5b9ebfbce9",
+              "name": "=is_test",
+              "value": "={{ $json.is_test }}",
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -5712,
+        784
+      ],
+      "id": "2531f2c8-c75a-45b8-ab34-ef364a786613",
+      "name": "Client Metadata"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "18afb9f1-76e3-448f-a4e0-99df188d3a01",
+              "leftValue": "={{ $('Client Metadata').first().json.is_group }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -4928,
+        880
+      ],
+      "id": "88b41f26-d4b1-4442-a6ed-6e5207bffe07",
+      "name": "Is Group Message?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7e340b68-a0fb-430f-8b11-2dc0a7722bdf",
+              "leftValue": "={{ $json.phone_number }}",
+              "rightValue": "380963236071",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -5712,
+        912
+      ],
+      "id": "eb906fd5-eb68-4d1d-8c6e-fad88ebe9546",
+      "name": "TESTING_IF",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## FOR TEST",
+        "height": 384,
+        "width": 256
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -5776,
+        688
+      ],
+      "typeVersion": 1,
+      "id": "e8a456a9-af70-4098-8d2e-e8bdb0e6bff1",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://wasenderapi.com/api/send-message",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $('ENV Variables').first().json.wasender_api_key }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={\n  \"to\": \"{{ $('Client Data').first().json.phone_number }}\", \n  \"text\": {{ JSON.stringify($json.output.message.replace('off_topic_redirect', '').trim()) }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -992,
+        864
+      ],
+      "id": "272f3659-8373-4fc7-abb4-69cbda880e09",
+      "name": "Send WasenderApi Message"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.wassenger.com/v1/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Token",
+              "value": "5b6a656367492cf458c91ca0ba88b125409419fa4a956848528326a64d268c00b5647ccbb851986c"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={\n  \"group\": \"{{ $('ENV Variables').first().json.manager_group_id }}\",\n  \"message\": {{ JSON.stringify($json.message) }}\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -192,
+        352
+      ],
+      "id": "08445b89-490a-4055-b74b-f32d8a280653",
+      "name": "Send Qualified Client Message3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://wasenderapi.com/api/send-message",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={  \n  \"to\": \"{{ $('ENV Variables').first().json.manager_group_id }}\",   \n  \"text\": {{ JSON.stringify($json.message) }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -48,
+        928
+      ],
+      "id": "56dcc994-9bf1-4d9a-92b3-76460d4c00be",
+      "name": "Send WasenderApi Message1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "MAm1jDZG5pRhtI6A",
+          "name": "kristina_dubai_WassenderAPI_auth"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -5232,
+        1552
+      ],
+      "id": "8621bcd5-afc2-4c67-a3ad-797e670109df",
+      "name": "Ignore Group Message"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "596962d1-2480-434f-a8db-bf622498668f",
+              "leftValue": "={{ $('Client Metadata').first().json.group_id}}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "2043d51a-4a74-4e14-86b6-125379952ffd",
+              "leftValue": "={{ $('Client Metadata').first().json.group_id}}",
+              "rightValue": "={{ $('ENV Variables').first().json.manager_group_id }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -5456,
+        1424
+      ],
+      "id": "9531b83a-373a-413b-8612-43d4e1a016dc",
+      "name": "Is stop list request?"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('ENV Variables').first().json.supabase_clients_url + '?on_conflict=phone_number' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify($json.numbers.map(n => ({ phone_number: n, qualification_done: true }))) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -4800,
+        1296
+      ],
+      "id": "8d1ac772-8af5-4fba-8d65-ef56301ebb95",
+      "name": "Upsert Clients",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "FAFnBfYyqTLXDpjY",
+          "name": "Kristina Dubai Supabase Auth Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const stopNumbersStr = $('Client Metadata').first().json.message\n\nconst numbers = stopNumbersStr\n  .split(\",\")\n  .map(s => s.normalize(\"NFKD\"))     // normalize Unicode\n  .map(s => s.replace(/[^\\d+]/g, \"\")) // leave only digits and +\n  .map(s => s.replace(/^\\+/, \"\"))    // remove + in the beginning\n  .filter(s => !!s)\n\nreturn [\n    { \n      json: { \n        numbers: numbers\n      } \n    }\n  ]\n// [\"971581829763\", \"366168609763\", \"12158565163\"]\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -5232,
+        1296
+      ],
+      "id": "bc9e4683-13d9-461d-9e48-3c78d0967dd5",
+      "name": "Get Array of Numbers"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://wasenderapi.com/api/send-message",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={  \"to\": \"{{ $('ENV Variables').first().json.manager_group_id }}\",   \"text\": \"{{ `Successfully added to stop list: ${$('Get Array of Numbers').first().json.numbers.join(', ')}`}}\"}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -4400,
+        1216
+      ],
+      "id": "d4dc9a01-4b10-45c5-92f4-ea8c77fe6165",
+      "name": "Send Stop List Success Message",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "MAm1jDZG5pRhtI6A",
+          "name": "kristina_dubai_WassenderAPI_auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://wasenderapi.com/api/send-message",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "{|  \"to\": \"120363404444968121@g.us\",   \"text\": \"FAILED to add numbers to stop list\"}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -4576,
+        1376
+      ],
+      "id": "3f573545-6a2e-428b-9704-c28fe2c5da6f",
+      "name": "Send Stop List Error Message",
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -4576,
+        1216
+      ],
+      "id": "50c114cf-4553-48bb-b8c3-2dac19e398f4",
+      "name": "Wait 5 seconds",
+      "webhookId": "f2daa8ae-bcf9-48e1-8e4c-2d0dc5a56bbc"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "22e978f2-6f1a-46bc-a37d-0a2bbf6b5884",
+              "leftValue": "={{ $json.numbers }}",
+              "rightValue": "",
+              "operator": {
+                "type": "array",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -5024,
+        1296
+      ],
+      "id": "73ca5e81-e12c-4fde-a0f3-3143aa50bf46",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -400,
+        928
+      ],
+      "id": "cbf0c983-ee44-4aa0-a403-1d0e5a93d00f",
+      "name": "Wait1",
+      "webhookId": "018cbb10-32c2-4d4a-8830-7ba31a3c90e8"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -400,
+        752
+      ],
+      "id": "e6fa2d01-5b05-44ce-8097-ca3dea5947e5",
+      "name": "Wait2",
+      "webhookId": "5239f246-6760-470b-af60-0b38914728c5"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c9f6b181-02ae-4382-bd69-a677eeded558",
+              "leftValue": "={{ $('AI Agent').first().json.output.client_type }}",
+              "rightValue": "agent",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -608,
+        752
+      ],
+      "id": "5004a3e0-5500-47d4-ace2-ee068d4cb792",
+      "name": "Is Agent?"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "698e79c1-c99d-4b13-9b99-c03146d8a31b",
+              "name": "agent_message",
+              "value": "*Emaar Beachfront*\nReady apartments with 2 years post-handover payment plan \n • 1 BDR – from 2.65M\n • 2 BDR – 4M\n • 3 BDR – 7.2M\n👉 https://drive.google.com/drive/mobile/folders/1F810_mr2AXBrysub0yiZi-OJuTXr7Ti6?usp=sharing \n\n\n🔥 *Palace Beach Residences*\n3 BDR, fully renovated - 9.3M\n\n👉 PHOTO https://strvkr.wixsite.com/palace3\n👉 VIDEO https://vimeo.com/1112575824",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -224,
+        752
+      ],
+      "id": "3662d937-b3a6-4b9a-8344-4aab19054237",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "test_ai",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -7024,
+        688
+      ],
+      "id": "8b382dce-559c-4f85-89ea-5c443ada0d45",
+      "name": "WasenderAPI Test Message",
+      "webhookId": "167afffd-d587-4d85-84a2-5e7b7c39360c",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://wasenderapi.com/api/send-message",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $('ENV Variables').first().json.wasender_api_key }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={\n  \"to\": \"{{ $('Client Data').first().json.phone_number }}\", \n  \"text\": {{ JSON.stringify($json.output.message.replace('off_topic_redirect', '').trim()) }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -992,
+        688
+      ],
+      "id": "3e4d6a2a-e6a0-422f-82d7-19ecfc7186a3",
+      "name": "Send WasenderApi Test Message"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://wasenderapi.com/api/send-message",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={\n  \"to\": \"{{ $('Client Data').first().json.phone_number }}\", \n  \"text\": {{ JSON.stringify($json.agent_message) }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -48,
+        752
+      ],
+      "id": "a48a7a53-1a1d-429f-bc2a-97781d3b3606",
+      "name": "Send Followup Agent Message",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "MAm1jDZG5pRhtI6A",
+          "name": "kristina_dubai_WassenderAPI_auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://fybqwzsdoqcucdtxhlla.supabase.co/rest/v1/clients?on_conflict=phone_number\n",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "=[{\n  \"phone_number\":\"380963236071\",\n  {{ (true ? '\"qualification_done\": true' : '') }}\n}]\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -5072,
+        1568
+      ],
+      "id": "58f563c7-f7c4-4edc-af48-7e200cea3629",
+      "name": "Upsert Clients1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "FAFnBfYyqTLXDpjY",
+          "name": "Kristina Dubai Supabase Auth Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ $('ENV Variables').first().json.is_test \n  ? $('ENV Variables').first().json.supabase_clients_url_test\n  : $('ENV Variables').first().json.supabase_clients_url\n}}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "id",
+              "value": "=eq.{{ $('Client Data').first().json.id }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={\n{{ ($json.output.qualification_done ? '\"qualification_done\": true,' : '') }}\n  \"reminder_sent\": false,\n  \"last_message_at\": \"{{ $now.toISO() }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1376,
+        1376
+      ],
+      "id": "067d54a3-574c-4320-b226-a3910b83a3fd",
+      "name": "Update Client1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "FAFnBfYyqTLXDpjY",
+          "name": "Kristina Dubai Supabase Auth Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "721d1f9f-3b00-466e-9c61-123e8bb37bf8",
+              "name": "output.qualification_done",
+              "value": true,
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1600,
+        1392
+      ],
+      "id": "f0f39a79-de6c-4fcb-a788-8118206d9d75",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.data.messages.message.conversation ?? $json.body.data.messages.message.extendedTextMessage.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    },
+                    "id": "8faa9523-8152-41d5-9193-a5b92faac672"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2ba06127-6b9a-4b18-94db-115b67901eb6",
+                    "leftValue": "={{ $json.body.data.messages.message.audioMessage }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Audio"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -6432,
+        768
+      ],
+      "id": "32e10f69-47e0-4fa2-8032-d65ce68c85e9",
+      "name": "Type"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1eaca9c5-dde0-4a95-8ba6-855ddb789dcd",
+              "name": "text",
+              "value": "={{ $json.body.data.messages.message.conversation ?? $json.body.data.messages.message.extendedTextMessage.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -6160,
+        688
+      ],
+      "id": "d7a1a714-269e-4705-811f-feb6a8dd4a36",
+      "name": "Text"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "Fv9rE9Unty56aL2x",
+          "mode": "list",
+          "cachedResultName": "HandleAudioMessage"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "body_data_messages_message_audioMessage_fileLength_firstItem": "={{ $json.body.data.messages.message.audioMessage.fileLength }}",
+            "body_data_messages_message_audioMessage_fileEncSha256_firstItem": "={{ $json.body.data.messages.message.audioMessage.fileEncSha256 }}",
+            "body_data_messages_message_audioMessage_mimetype": "={{ $json.body.data.messages.message.audioMessage.mimetype }}",
+            "body_data_messages_message_audioMessage_mediaKey_firstItem": "={{ $json.body.data.messages.message.audioMessage.mediaKey }}",
+            "body_data_messages_message_audioMessage_url_firstItem": "={{ $json.body.data.messages.message.audioMessage.url }}",
+            "body_data_messages_key_id_firstItem": "={{ $json.body.data.messages.key.id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "body_data_messages_key_id_firstItem",
+              "displayName": "body_data_messages_key_id_firstItem",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "body_data_messages_message_audioMessage_url_firstItem",
+              "displayName": "body_data_messages_message_audioMessage_url_firstItem",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "body_data_messages_message_audioMessage_mediaKey_firstItem",
+              "displayName": "body_data_messages_message_audioMessage_mediaKey_firstItem",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "body_data_messages_message_audioMessage_mimetype",
+              "displayName": "body_data_messages_message_audioMessage_mimetype",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "body_data_messages_message_audioMessage_fileEncSha256_firstItem",
+              "displayName": "body_data_messages_message_audioMessage_fileEncSha256_firstItem",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "body_data_messages_message_audioMessage_fileLength_firstItem",
+              "displayName": "body_data_messages_message_audioMessage_fileLength_firstItem",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        -6160,
+        880
+      ],
+      "id": "a5476901-88c0-4d29-933d-b89a22b398ce",
+      "name": "HandleAudioMessage"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -6816,
+        784
+      ],
+      "id": "b63b5cf3-f6df-4c57-9158-ba74287a7c91",
+      "name": "Message"
+    }
+  ],
+  "pinData": {
+    "Message Received": [
+      {
+        "json": {
+          "headers": {
+            "host": "redstone123.app.n8n.cloud",
+            "user-agent": "wa-api-webhook",
+            "content-length": "3340",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "34.16.170.133",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "US",
+            "cf-ray": "974e2352073f1ef2-LHR",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json; charset=utf-8",
+            "idempotency-key": "3FFE738AC7BEB6233F99",
+            "x-forwarded-for": "34.16.170.133, 162.158.216.149",
+            "x-forwarded-host": "redstone123.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-45-5cf4858c8f-sczzn",
+            "x-is-trusted": "yes",
+            "x-real-ip": "34.16.170.133"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "id": "3FFE738AC7BEB6233F99",
+            "object": "message",
+            "event": "message:in:new",
+            "created": 1756156873,
+            "device": {
+              "id": "6894781043481610f9a9e941",
+              "phone": "+971569901723",
+              "alias": "Kristina",
+              "plan": "io-professional"
+            },
+            "data": {
+              "id": "3FFE738AC7BEB6233F99",
+              "type": "text",
+              "flow": "inbound",
+              "status": "active",
+              "ack": "delivered",
+              "from": "120363419887584150@g.us",
+              "fromNumber": "+380963236071",
+              "to": "971569901723@c.us",
+              "toNumber": "+971569901723",
+              "date": "2025-08-25T21:21:13.000Z",
+              "timestamp": 1756156873,
+              "body": "998934621498, ‪+99 8934621 499‬",
+              "author": "380963236071@c.us",
+              "chat": {
+                "id": "120363419887584150@g.us",
+                "name": "Qualified Clients",
+                "date": "2025-08-25T21:19:24.000Z",
+                "type": "group",
+                "status": "pending",
+                "waStatus": "archived",
+                "statusUpdatedAt": "2025-08-25T21:19:25.264Z",
+                "statusUpdatedBy": null,
+                "prevStatus": "pending",
+                "prevStatusUpdatedAt": "2025-08-08T07:43:17.863Z",
+                "archivedAt": "2025-08-22T11:06:20.278Z",
+                "firstMessageAt": "2025-08-07T18:57:35.000Z",
+                "lastMessageAt": "2025-08-25T21:21:13.000Z",
+                "lastMessageTime": 1756156873,
+                "lastOutboundMessageAt": "2025-08-25T20:33:06.000Z",
+                "lastInboundMessageAt": "2025-08-25T21:21:13.000Z",
+                "lastReactionAt": "2025-08-08T06:04:30.553Z",
+                "lastReactionEmoji": "👍",
+                "lastReactionAuthor": "267645819596960@lid",
+                "lastAutoReply": null,
+                "lastAutoReplyAt": null,
+                "stats": {
+                  "inboundMessages": 0,
+                  "localMessages": 98,
+                  "notes": 0,
+                  "outboundMessages": 0
+                },
+                "labels": [],
+                "owner": {
+                  "agent": null,
+                  "department": null,
+                  "previousDepartment": null,
+                  "departmentAssigner": null,
+                  "departmentUpdatedAt": null,
+                  "autoAssignDepartment": null,
+                  "autoAssignDepartmentAt": null
+                },
+                "contact": {
+                  "wid": "120363419887584150@g.us",
+                  "type": "group",
+                  "name": "Qualified Clients",
+                  "syncedAt": "2025-08-07T18:43:00.694Z",
+                  "groupId": "120363419887584150",
+                  "info": {
+                    "languages": [],
+                    "links": [],
+                    "fullName": null
+                  },
+                  "locationInfo": {},
+                  "metadata": [],
+                  "campaigns": [],
+                  "subscription": {
+                    "status": "active",
+                    "updatedAt": "2025-08-07T18:43:00.694Z"
+                  }
+                },
+                "group": {
+                  "date": "2025-08-07T18:38:05.000Z",
+                  "owner": "380963236071@c.us",
+                  "community": null,
+                  "isCommunityAnnounce": false,
+                  "announce": false,
+                  "restrict": false,
+                  "membershipApproval": false,
+                  "membershipInvite": true,
+                  "totalParticipants": 3
+                },
+                "links": {
+                  "chat": "/v1/chat/6894781043481610f9a9e941/chats/120363419887584150@g.us",
+                  "messages": "/v1/chat/6894781043481610f9a9e941/messages?chat=120363419887584150@g.us",
+                  "status": "/v1/chat/6894781043481610f9a9e941/status?chat=120363419887584150@g.us",
+                  "contact": "/v1/chat/6894781043481610f9a9e941/contacts/120363419887584150@g.us",
+                  "device": "/v1/devices/6894781043481610f9a9e941",
+                  "participants": "/v1/chat/6894781043481610f9a9e941/chats/120363419887584150@g.us/participants"
+                }
+              },
+              "events": {},
+              "meta": {
+                "containsEmoji": false,
+                "isBizNotification": false,
+                "isBroadcast": false,
+                "isChannel": false,
+                "isDoc": false,
+                "isEphemeral": false,
+                "isFailed": false,
+                "isForwarded": false,
+                "isGif": false,
+                "isGroup": true,
+                "isLinkPreview": false,
+                "isLive": false,
+                "isNotification": false,
+                "isPSA": false,
+                "isRevoked": false,
+                "isStar": false,
+                "isUnreadType": false,
+                "notifyName": "Maksym",
+                "rtl": false,
+                "source": "web",
+                "isFirstMessage": false
+              },
+              "links": {
+                "message": "/v1/chat/6894781043481610f9a9e941/messages/3FFE738AC7BEB6233F99",
+                "chat": "/v1/chat/6894781043481610f9a9e941/chats/120363419887584150@g.us",
+                "contact": "/v1/chat/6894781043481610f9a9e941/contacts/120363419887584150@g.us",
+                "chatMessages": "/v1/chat/6894781043481610f9a9e941/messages?chat=120363419887584150@g.us",
+                "device": "/v1/devices/6894781043481610f9a9e941"
+              }
+            }
+          },
+          "webhookUrl": "https://redstone123.app.n8n.cloud/webhook/whatsapp-in",
+          "executionMode": "production"
+        }
+      }
+    ],
+    "Gupsup Message": [
+      {
+        "json": {
+          "headers": {
+            "host": "redstone123.app.n8n.cloud",
+            "user-agent": "okhttp/4.12.0",
+            "content-length": "556",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "52.66.99.126",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "IN",
+            "cf-ray": "97565af1f07cf15a-BOM",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json; charset=utf-8",
+            "x-forwarded-for": "52.66.99.126, 172.70.218.200",
+            "x-forwarded-host": "redstone123.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-45-5cf4858c8f-cl65b",
+            "x-is-trusted": "yes",
+            "x-real-ip": "52.66.99.126"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "entry": [
+              {
+                "changes": [
+                  {
+                    "field": "messages",
+                    "value": {
+                      "contacts": [
+                        {
+                          "profile": {
+                            "name": "Maksym"
+                          },
+                          "wa_id": "380963236071"
+                        }
+                      ],
+                      "messages": [
+                        {
+                          "from": "380963236071",
+                          "id": "wamid.HBgMMzgwOTYzMjM2MDcxFQIAEhggMjg5RkE3NDA0NkExNTdFNTE4MDI5OEQ5Qjk2RkIxMzYA",
+                          "text": {
+                            "body": "Здравствуйте"
+                          },
+                          "timestamp": "1756243037",
+                          "type": "text"
+                        }
+                      ],
+                      "messaging_product": "whatsapp",
+                      "metadata": {
+                        "display_phone_number": "94743353842",
+                        "phone_number_id": "768586436332705"
+                      }
+                    }
+                  }
+                ],
+                "id": "2291962534532339"
+              }
+            ],
+            "gs_app_id": "3ffbd417-3be1-4fbe-b1ae-949c233e4333",
+            "object": "whatsapp_business_account"
+          },
+          "webhookUrl": "https://redstone123.app.n8n.cloud/webhook/7bea28e7-a91a-4198-a0eb-0caef77aefb8",
+          "executionMode": "production"
+        }
+      }
+    ],
+    "WasenderAPI Message": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.orbitalgarden.space",
+            "user-agent": "axios/1.12.2",
+            "content-length": "779",
+            "accept": "application/json, text/plain, */*",
+            "accept-encoding": "gzip, compress, deflate, br",
+            "content-type": "application/json",
+            "via": "1.1 Caddy",
+            "x-forwarded-for": "72.60.126.115",
+            "x-forwarded-host": "n8n.orbitalgarden.space",
+            "x-forwarded-proto": "https",
+            "x-webhook-signature": "08139d3542aba3cba134211058ea6a6f"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "event": "messages.received",
+            "sessionId": "31f80b7c5666626556ae8960357445868e2bc15b8530c964663e7cf8565e618c",
+            "data": {
+              "messages": {
+                "key": {
+                  "remoteJid": "144684596883503@s.whatsapp.net",
+                  "fromMe": false,
+                  "id": "3A42EA3E98AC3AE87575",
+                  "senderLid": "144684596883503@lid",
+                  "senderPn": "19808002209@s.whatsapp.net",
+                  "cleanedSenderPn": "19808002209",
+                  "addressingMode": "lid"
+                },
+                "messageTimestamp": 1761674527,
+                "pushName": "TD",
+                "broadcast": false,
+                "message": {
+                  "conversation": "Hi gorgeous",
+                  "messageContextInfo": {
+                    "deviceListMetadata": {
+                      "senderTimestamp": "1761668966",
+                      "recipientKeyHash": "mijkDIy2KKIJQg==",
+                      "recipientTimestamp": "1760772319"
+                    },
+                    "deviceListMetadataVersion": 2,
+                    "messageSecret": "xcD0KxYyjJbM7SavRrIk1OPnLUmwrkvoTWLBMFn48to="
+                  }
+                },
+                "remoteJid": "144684596883503@s.whatsapp.net",
+                "id": "3A42EA3E98AC3AE87575"
+              }
+            },
+            "timestamp": 1761674527424
+          },
+          "webhookUrl": "https://n8n.orbitalgarden.space/webhook/kristina_dubai",
+          "executionMode": "production"
+        }
+      }
+    ],
+    "WasenderAPI Test Message": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.orbitalgarden.space",
+            "user-agent": "axios/1.12.2",
+            "content-length": "875",
+            "accept": "application/json, text/plain, */*",
+            "accept-encoding": "gzip, compress, deflate, br",
+            "content-type": "application/json",
+            "via": "1.1 Caddy",
+            "x-forwarded-for": "69.62.66.76",
+            "x-forwarded-host": "n8n.orbitalgarden.space",
+            "x-forwarded-proto": "https",
+            "x-webhook-signature": "da6607be0a9be6e9e055cffa5df103dc"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "event": "messages.received",
+            "sessionId": "a1ce08457c8ae054d4ff2849f61141ad3af71639a1663825a5fa1bb4c7bd3a0a",
+            "data": {
+              "messages": {
+                "key": {
+                  "remoteJid": "380963236071@s.whatsapp.net",
+                  "fromMe": false,
+                  "id": "ACBC8085CD9ECC145241D23BC2DB5DB4",
+                  "senderLid": "223690990071920@lid",
+                  "senderPn": "380963236071@s.whatsapp.net",
+                  "cleanedSenderPn": "380963236071",
+                  "addressingMode": "pn"
+                },
+                "messageTimestamp": 1761835989,
+                "pushName": "Maksym",
+                "broadcast": false,
+                "message": {
+                  "conversation": "Hello",
+                  "messageContextInfo": {
+                    "deviceListMetadata": {
+                      "senderKeyHash": "80uKoW6Lf5mNGg==",
+                      "senderTimestamp": "1760980763",
+                      "recipientKeyHash": "tVv6tD32kLoHTA==",
+                      "recipientTimestamp": "1760517344"
+                    },
+                    "deviceListMetadataVersion": 2,
+                    "messageSecret": "xWIH8qT8E1dF/ZQuiDXg6VuL5IVIzD4jVl451BemP9s="
+                  }
+                },
+                "messageBody": "Hello",
+                "remoteJid": "380963236071@s.whatsapp.net",
+                "id": "ACBC8085CD9ECC145241D23BC2DB5DB4"
+              }
+            },
+            "timestamp": 1761835989880
+          },
+          "webhookUrl": "https://n8n.orbitalgarden.space/webhook/test_ai",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "OpenAI1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Client Qualified": {
+      "main": [
+        [
+          {
+            "node": "Create Qualification Message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Is Agent?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Update Client",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Client": {
+      "main": [
+        [
+          {
+            "node": "Check Client",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Client": {
+      "main": [
+        [
+          {
+            "node": "Create Client",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Client Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Client Is Already Qualified",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Client": {
+      "main": [
+        [
+          {
+            "node": "Client Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Client Data": {
+      "main": [
+        [
+          {
+            "node": "Add to Messages Stack",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Wait 100 seconds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Chat Messages": {
+      "main": [
+        [
+          {
+            "node": "Chat History String",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Messages Buffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Latest Message Stack": {
+      "main": [
+        [
+          {
+            "node": "Should Continue?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Should Continue?": {
+      "main": [
+        [
+          {
+            "node": "Get Chat Messages",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Client sent another message, stop execution",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Valid?": {
+      "main": [
+        [
+          {
+            "node": "Get Client",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Invalid input data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Messages Buffer": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Add Client Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Qualification Message": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Output Not Empty?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ENV Variables": {
+      "main": [
+        [
+          {
+            "node": "Is Test?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Test?": {
+      "main": [
+        [
+          {
+            "node": "Get Client",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Is Group Message?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Test?1": {
+      "main": [
+        [
+          {
+            "node": "Send WasenderApi Test Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send WasenderApi Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prod test If": {
+      "main": [
+        [
+          {
+            "node": "Prod test If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Output Not Empty?": {
+      "main": [
+        [
+          {
+            "node": "Is Test?1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Add Assistant Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 100 seconds": {
+      "main": [
+        [
+          {
+            "node": "Get Latest Message Stack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Valid Gupshup Message?": {
+      "main": [
+        [
+          {
+            "node": "Gupshup Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gupsup Message": {
+      "main": [
+        [
+          {
+            "node": "Valid Gupshup Message?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Valid Wassenger Message?": {
+      "main": [
+        [
+          {
+            "node": "Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WasenderAPI Message": {
+      "main": [
+        [
+          {
+            "node": "Message",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Wassenger Metadata": {
+      "main": [
+        [
+          {
+            "node": "Client Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Client Metadata": {
+      "main": [
+        [
+          {
+            "node": "ENV Variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Group Message?": {
+      "main": [
+        [
+          {
+            "node": "Is stop list request?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send WasenderApi Message": {
+      "main": [
+        [
+          {
+            "node": "Client Qualified",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is stop list request?": {
+      "main": [
+        [
+          {
+            "node": "Get Array of Numbers",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ignore Group Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upsert Clients": {
+      "main": [
+        [
+          {
+            "node": "Wait 5 seconds",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Stop List Error Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Array of Numbers": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 5 seconds": {
+      "main": [
+        [
+          {
+            "node": "Send Stop List Success Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Upsert Clients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Send WasenderApi Message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Agent?": {
+      "main": [
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Send Followup Agent Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WasenderAPI Test Message": {
+      "main": [
+        [
+          {
+            "node": "Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Update Client1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Type": {
+      "main": [
+        [
+          {
+            "node": "Text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HandleAudioMessage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HandleAudioMessage": {
+      "main": [
+        [
+          {
+            "node": "Wassenger Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text": {
+      "main": [
+        [
+          {
+            "node": "Wassenger Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message": {
+      "main": [
+        [
+          {
+            "node": "Valid Wassenger Message?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6dcc8de2-d62d-45c4-9bcd-8c6dfe2eaec0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c9e53a150db3979558dce85b88732650eafd440e09b4690afc30683da1136ad9"
+  },
+  "id": "2H4JCsV0zge66tTv",
+  "tags": [
+    {
+      "createdAt": "2025-09-14T12:25:31.358Z",
+      "updatedAt": "2025-09-14T12:25:31.358Z",
+      "id": "oi3mfeDHd8seIZYf",
+      "name": "latest"
+    }
+  ]
+}
