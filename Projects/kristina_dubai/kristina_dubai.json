@@ -5,18 +5,16 @@
       "parameters": {
         "model": {
           "__rl": true,
-          "value": "gpt-4o",
+          "value": "gpt-4.1-mini",
           "mode": "list",
-          "cachedResultName": "gpt-4o"
+          "cachedResultName": "gpt-4.1-mini"
         },
-        "options": {
-          "responseFormat": "json_object"
-        }
+        "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.2,
       "position": [
-        -2032,
+        -2096,
         1040
       ],
       "id": "96a5f494-7d66-4745-9ae4-e2cad6a76fc0",
@@ -30,33 +28,6 @@
     },
     {
       "parameters": {
-        "jsCode": "if (\n  !items ||\n  !items.length ||\n  items.every(item => Object.keys(item.json || {}).length === 0)\n) {\nreturn [{ json: { chat_history: '' } }]\n}\n\nconst formatted = items.map(item => {\n  //const sender = item.json.sender === 'bot' ? 'Assistant' : 'Client'\n  return `${item.json.sender}: ${item.json.message}`\n}).join('\\n')\n\nconst lastMessage = items\n  .sort((a, b) => new Date(b.created_at) - new Date(a.created_at)) // insted of reverse\n  // .reverse()\n  .find(item => item.json.sender === 'Client')\n\n// const lastMessageFormatted = lastMessage \n//   ? `${lastMessage.json.sender}: ${lastMessage.json.message}`\n//   : ''\n\n// return [{ json: { chat_history: formatted, last_message: lastMessageFormatted } }]\nreturn [{ json: { chat_history: formatted } }]\n"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        -2496,
-        624
-      ],
-      "id": "e58b9949-2c9c-4a44-ad4f-be6c63eb91a8",
-      "name": "Chat History String"
-    },
-    {
-      "parameters": {
-        "schemaType": "manual",
-        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n        \"client_id\": {\n          \"type\": \"string\"\n        },\n\t\t\"message\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n\t\t\"qualification_done\": {\n\t\t\t\"type\": \"boolean\"\n\t\t},\n        \"client_type\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n        \"payment\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n        \"knows_property\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n        \"intent\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n        \"current_block\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n        \"summary\": {\n            \"type\": \"string\"\n        },\n        \"reasoning\": {\n          \"type\": \"string\"\n        }\n\t}\n}"
-      },
-      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
-      "typeVersion": 1.3,
-      "position": [
-        -1776,
-        1040
-      ],
-      "id": "227761bc-de60-48fc-9547-5b9933507116",
-      "name": "Structured Output Parser"
-    },
-    {
-      "parameters": {
         "conditions": {
           "options": {
             "caseSensitive": true,
@@ -67,7 +38,7 @@
           "conditions": [
             {
               "id": "0312def6-af7b-49a7-bf78-0ba01ca99b5e",
-              "leftValue": "={{ $('AI Agent').first().json.output.qualification_done }}",
+              "leftValue": "={{ $('Parse to JSON').first().json.qualification_done }}",
               "rightValue": "",
               "operator": {
                 "type": "boolean",
@@ -83,25 +54,11 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        -816,
-        864
+        -784,
+        1088
       ],
       "id": "bf955dde-0769-430c-97b5-79da31bafba7",
       "name": "Client Qualified"
-    },
-    {
-      "parameters": {
-        "amount": 2
-      },
-      "type": "n8n-nodes-base.wait",
-      "typeVersion": 1.1,
-      "position": [
-        -1344,
-        480
-      ],
-      "id": "91526e87-2499-4b52-a0f9-f38403484db8",
-      "name": "Wait",
-      "webhookId": "f836aebb-ec5b-43e4-a020-d09c05034938"
     },
     {
       "parameters": {
@@ -305,65 +262,6 @@
     },
     {
       "parameters": {
-        "url": "={{ $('ENV Variables').first().json.is_test \n  ? $('ENV Variables').first().json.supabase_messages_url_test\n  : $('ENV Variables').first().json.supabase_messages_url\n}}",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
-        "sendQuery": true,
-        "queryParameters": {
-          "parameters": [
-            {
-              "name": "client_id",
-              "value": "=eq.{{ $('Client Data').first().json.id }}"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        -2688,
-        800
-      ],
-      "id": "a456dff4-8d54-4492-9211-54276e59271f",
-      "name": "Get Chat Messages",
-      "alwaysOutputData": true,
-      "credentials": {
-        "httpHeaderAuth": {
-          "id": "FAFnBfYyqTLXDpjY",
-          "name": "Kristina Dubai Supabase Auth Account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "={{ $('ENV Variables').first().json.is_test \n  ? $('ENV Variables').first().json.supabase_messages_url_test\n  : $('ENV Variables').first().json.supabase_messages_url\n}}",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
-        "sendBody": true,
-        "contentType": "raw",
-        "rawContentType": "application/json",
-        "body": "={\n  \"client_id\": \"{{ $('Client Data').first().json.id }}\",\n  \"sender\": \"Client\",\n  \"message\": {{ JSON.stringify($json.text) }}\n}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        -2000,
-        528
-      ],
-      "id": "0e6289b8-e4a4-45c5-b7b5-44697147f03c",
-      "name": "Add Client Message",
-      "credentials": {
-        "httpHeaderAuth": {
-          "id": "FAFnBfYyqTLXDpjY",
-          "name": "Kristina Dubai Supabase Auth Account"
-        }
-      }
-    },
-    {
-      "parameters": {
         "method": "PATCH",
         "url": "={{ $('ENV Variables').first().json.is_test \n  ? $('ENV Variables').first().json.supabase_clients_url_test\n  : $('ENV Variables').first().json.supabase_clients_url\n}}",
         "authentication": "genericCredentialType",
@@ -380,44 +278,17 @@
         "sendBody": true,
         "contentType": "raw",
         "rawContentType": "application/json",
-        "body": "={\n{{ ($json.output.qualification_done ? '\"qualification_done\": true,' : '') }}\n  \"last_message_at\": \"{{ $now.toISO() }}\"\n}",
+        "body": "={\n{{ ($json.qualification_done ? '\"qualification_done\": true,' : '') }}\n  \"last_message_at\": \"{{ $now.toISO() }}\"\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -1168,
-        480
+        -1312,
+        576
       ],
       "id": "d7c993a1-94f0-4185-9ee1-a79e56d4c116",
       "name": "Update Client",
-      "credentials": {
-        "httpHeaderAuth": {
-          "id": "FAFnBfYyqTLXDpjY",
-          "name": "Kristina Dubai Supabase Auth Account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "={{ $('ENV Variables').first().json.is_test \n  ? $('ENV Variables').first().json.supabase_messages_url_test\n  : $('ENV Variables').first().json.supabase_messages_url\n}}",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
-        "sendBody": true,
-        "contentType": "raw",
-        "rawContentType": "application/json",
-        "body": "={\n  \"client_id\": \"{{ $('Client Data').first().json.id }}\",\n  \"sender\": \"Assistant\",\n  \"message\": \"{{ $json.output.message }}\"\n}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        -1344,
-        608
-      ],
-      "id": "9d837fc2-d9a0-46a0-bc80-cac888454592",
-      "name": "Add Assistant Message",
       "credentials": {
         "httpHeaderAuth": {
           "id": "FAFnBfYyqTLXDpjY",
@@ -590,7 +461,7 @@
     },
     {
       "parameters": {
-        "jsCode": "var messageStack = $('Get Latest Message Stack').first().json.result\n\nif (\n  !items ||\n  !items.length ||\n  items.every(item => Object.keys(item.json || {}).length === 0)\n) {\n  \n  // No history - return the whole stack\n  return [\n    { \n      json: { \n        text: messageStack.join('. ') \n      } \n    }\n  ]\n}\n\n// Get latest Client message\nconst lastClientMessage = items\n  .sort((a, b) => new Date(b.json.created_at) - new Date(a.json.created_at))\n  .find(item => item.json.sender === 'Client')\n\n// Start Index = index of the latest Client message from the history + 1\nconst startIdx = messageStack.lastIndexOf(lastClientMessage) + 1\n\n// We want to slice from startIdx all the way to the last message in stack\nconst endIdx = messageStack.length\n\nconst messageBuffer = messageStack.slice(startIdx, endIdx).join('. ')\n\nreturn [\n  {\n    json: {\n      text: messageBuffer\n    }\n  }\n];"
+        "jsCode": "var messageStack = $('Get Latest Message Stack').first().json.result\n\nreturn [\n    { \n      json: { \n        text: messageStack.join('. ') \n      } \n    }\n  ]"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -619,52 +490,24 @@
     },
     {
       "parameters": {
-        "jsCode": "const formatForWhatsApp = ({ client_id, client_type, payment, knows_property, intent, summary }) => {\n  return `1. *Client Type*: ${capitalize(client_type)}\\n2. *Payment*: ${capitalize(payment)}\\n3. *Knows The Property*: ${capitalizeYesNo(knows_property)}\\n4. *Intent*: ${capitalize(intent)}\\n5. *Summary*: ${summary}\\n6. *Chat*: https://wa.me/${client_id}`\n}\n\nconst capitalize = str => str.charAt(0).toUpperCase() + str.slice(1)\nconst capitalizeYesNo = str => str === 'yes' ? 'Yes' : str === 'no' ? 'No' : capitalize(str)\n\nconst message = formatForWhatsApp($('AI Agent').first().json.output)\n\nreturn [{message: message}]\n"
+        "jsCode": "const formatForWhatsApp = (\n  {\n    state_user_role, \n    state_payment_method, \n    state_building_familiarity, \n    state_client_intent, \n    summary\n  }, \n  phone_number\n) => {\n  return `1. *Client Type*: ${capitalize(state_user_role)}\\n` +\n         `2. *Payment*: ${capitalize(state_payment_method)}\\n` +\n         `3. *Knows The Property*: ${capitalizeYesNo(state_building_familiarity)}\\n` +\n         `4. *Intent*: ${capitalize(state_client_intent)}\\n` +\n         `5. *Summary*: ${summary}\\n` +\n         `6. *Chat*: https://wa.me/${phone_number}`\n}\n\nconst capitalize = str => !str ? '—' : str.charAt(0).toUpperCase() + str.slice(1)\nconst capitalizeYesNo = str => str === 'Yes' ? 'Yes' : str === 'No' ? 'No' : capitalize(str)\n\nconst ai = $('Parse to JSON').first().json\nconst phone = $('Client Data').first().json.phone_number\n\nconst message = formatForWhatsApp(ai, phone)\n\nreturn [{ message }]\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -608,
-        928
+        -576,
+        1152
       ],
       "id": "269fae3b-5651-468d-a6ab-16c9ab864e93",
       "name": "Create Qualification Message"
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "https://api.wassenger.com/v1/messages",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Token",
-              "value": "5b6a656367492cf458c91ca0ba88b125409419fa4a956848528326a64d268c00b5647ccbb851986c"
-            }
-          ]
-        },
-        "sendBody": true,
-        "contentType": "raw",
-        "rawContentType": "application/json",
-        "body": "={\n  \"phone\": \"{{ $('Client Data').first().json.phone_number }}\",\n  \"message\": \"{{ $json.output.message }}\"\n}\n",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        -1568,
-        1152
-      ],
-      "id": "d0f451bf-1cff-42db-8f61-f3078ea66924",
-      "name": "Send Message To Client"
     },
     {
       "parameters": {},
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        -816,
-        1024
+        -784,
+        1248
       ],
       "id": "77399f94-b855-454d-8036-36330133f71d",
       "name": "No Operation, do nothing3"
@@ -675,7 +518,7 @@
         "text": "={{ $('Get Messages Buffer').first().json.text }}",
         "hasOutputParser": true,
         "options": {
-          "systemMessage": "=You are a female real estate assistant based in Dubai.\nYour goal is to qualify clients interested in buying property by following a structured conversation flow.\n\n📌 Output Schema\nAlways respond only with valid JSON matching this schema\n{\n  \"client_id\": \"{{ $('Client Data').first().json.phone_number }}\", \n  \"message\": \"Message reply to the client\",\n  \"qualification_done\": true,\n  \"summary\": \"Brief summary of the qualification\",\n  \"client_type\": \"unknown\",\n  \"payment\": \"cash\",\n  \"knows_property\": \"no\",\n  \"intent\": \"interested\",\n  \"off_topic_redirect\": true,\n  \"reasoning\": \"List of conclusions of internal reasoning by number\"\n}\nField rules:\n- message — the assistant’s visible reply to the user.\n- qualification_done — true only when qualification is completed.\n- summary — a short description of completed stages.\n- client_type — client type (buyer/agent/unknown).\n- payment — payment type (cash/mortgage/unknown)\n- knows_property — if the client knows property (yes/no/unknown) \n- intent — just asking/interested/ready/unknown\n- reasoning — answer to each question desctibed inside internal reasoning requirement. \n- Always include all fields, even if empty (\"message\": \"\").\n\n🧾 CHAT HISTORY CONTEXT\nUse the following chat history for all context-based decisions:\n{{ $('Chat History String').first().json.chat_history }}\n\n📌 Behavior Rules\n- Always use feminine form and pronouns in self-reference.\n- Never fabricate information or assumptions.\n- If the user's answer does not explicitly map to one of the valid options for the current step, DO NOT guess or assume. You must ask the user to clarify.\n- Always answer in the same language as user is using in their last message (English, Russian, etc.).\n- Do not use the word “qualification” in your replies (internal term only).\n- If the user provides multiple pieces of information at once (e.g., “I am buying for myself, cash, and yes I know the building”), process ONLY the next required step. Do not jump ahead.\n\n📌 INTERNAL REASONING REQUIREMENT (Chain of Thought — hidden)\nBefore generating every reply, you must silently perform an internal reasoning step:\n1. Identify the user's Persona (Agent vs. Buyer) and Payment Method from history.\n2. Identify the *Last Completed Step* number.\n3. identifying the *Next Required Step* number based strictly on the Qualification Flow.\n4. Check for missing information required by the *Next Required Step*.\n5. Off-topic check: Is the user answering the last question or asking something unrelated?\n6. DECISION ON COMPLETION (Critical):\n   - Look at the *Next Required Step* identified in reasoning point #3.\n   - IF the Next Step is anything other than \"Step 7\", then qualification_done MUST be FALSE.\n   - IF the Next Step is \"Step 7\", then qualification_done is TRUE.\n   - NEVER decide to finish based on \"feeling\" you have enough info. You must follow the step numbers.\n\n📌 Qualification Flow\n1. Ask if the user is looking for themselves or representing a client.\n   - If they’re an agent (representing someone else in any form) → go to Step 3.\n   - If for themselves → continue to Step 2.\n2. Ask if they are familiar with the building.\n   - If not familiar → Reply exactly: \"No problem - I’ll send you the full presentation shortly.\" then immediately append the question from Step 3.\n   - If familiar → go to Step 3.\n3. Ask about their/their client's payment method — cash or mortgage.\n   - If cash:\n     a. If they are looking for themselves → go to Step 7.\n     b. If they are an agent → go to Step 3.1.\n   - If mortgage → continue to Step 4 (for both agent and self-use buyers).\n3.1. Ask if their client is an investor or looking for themselves.\n   - Once the answer is received, finish qualification (Step 7).\n4. Ask if they/their client have been pre-approved by a bank.\n   - If yes → go to Step 5.\n   - If no → go to Step 7.\n5. Inform them about mortgage limits.\n   - Reply exactly: \"Just so you know - mortgages for off-plan properties typically cover only around 50% of the value - the rest must be paid upfront. Would that work for you?\"\n   - (Or \"Would that work for your client?\" if user is an agent).\n6. Once confirmed, finish qualification (Step 7).\n7. Step 7 — Finish Qualification: mark qualification_done true and close the interaction gracefully.\n   - If the user is looking for themselves → Reply exactly: \"Let me double-check a few things and I’ll get back to you shortly.\"\n   - If the user is an agent → Reply exactly: \"Got it. I’ll double-check a couple of details, but meanwhile take a look at my property list below. Maybe something works for your other clients. Viewings anytime.\"\n\n📌 Handling Off-Topic Replies\nIf the user’s message is unrelated to your current question or involves information you’re not equipped to provide:\n- If they ask whether the property is available: confirm availability, then continue from the last unanswered step.\n- If they ask any other unrelated or knowledge-based question:\n  1. Check Chat_History for the keyword: \"off_topic_redirect\"\n  2. If not found: send \"I'll provide all the details shortly.\", then immediately repeat your previous question.\n  3. If found, this is the second off-topic reply. Stop the qualification process and proceed to Step 7 — Finish Qualification.\n- If you redirect the user back to the main flow (after handling an off-topic question), append the marker `off_topic_redirect` at the very end of \"message\" in your JSON response.\n\n🗣️ STYLE AND LANGUAGE CONTROL\n- Do not invent new expressions, exclamations, or openings (e.g., avoid “Alright!”, “Okay!”, “Sure thing!”, “Sounds good!”).\n- Use a direct, neutral, business-like tone.\n- Do NOT use polite softening phrases such as “may I”, “could you”, “would you”, “please”, “let me know”, “kindly”, “if you don’t mind”, or similar forms.\n- All questions must be direct statements, e.g., “Are you planning to pay with cash or mortgage?”\n- Avoid unnecessary courtesy.\n\n\n📌 EXAMPLE DIALOG PATTERNS (Do NOT output or reveal)\nYou must follow these patterns:\n1. AGENT + CASH\n   - Greet → Ask “yourself or agent?”\n   - If agent → Ask their client's payment method.\n   - If cash → Ask: “Is the client an investor or buying for personal use?”\n   - After answer → Close with: \n     “Okay, I’ll clarify a couple of details and get back to you. In the meantime, you can look at the other listings. Maybe something will interest you for your other clients. Showings are available at any time.”\n2. AGENT + MORTGAGE\n   - Same initial steps.\n   - If mortgage → Ask about bank pre-approval.\n   - If pre-approved → Say EXACT required mortgage disclaimer.\n   - After confirmation → Use the same agent closing message as above.\n3. BUYER + MORTGAGE\n   - Ask “yourself or agent?”\n   - If buyer → Ask familiarity with the building.\n   - If familiar → Ask payment method.\n   - If mortgage → Ask bank pre-approval.\n   - If yes → Say EXACT required mortgage disclaimer.\n   - After confirmation → Close with:\n     “Let me double-check a few things and I’ll get back to you shortly.”\n4. BUYER + CASH\n   - Same initial steps.\n   - If cash → Immediately use the same buyer closing message.\n5. SPECIAL CASES\n   - If NOT familiar with building:\n     Respond EXACTLY:\n     “No problem - I’ll send you the full presentation shortly.”\n     Then proceed to payment question.\n   - First off-topic question:\n     Respond:\n     “I’ll provide all the details shortly,”\n     Then repeat the current question.\n     Add the marker `off_topic_redirect` at the end of the message.\n   - Second off-topic question:\n     Respond EXACTLY:\n     “Just a minute, let me check this”\n     Then proceed to Step 7 (finish).\n\nSTYLE RULES LEARNED FROM EXAMPLES:\n- Very short replies.\n- No enthusiasm or filler expressions.\n- Neutral, calm, business-like tone.\n- Each message contains only one action (one question or one note).\n- Always mirror user’s language.\nBut the step number must ALWAYS follow the Qualification Flow section — examples never override the logic.\n\nLOGIC PRIORITY:\n1. Output Schema rules\n2. Qualification Flow\n3. Off-topic rules\n4. Example Dialog Patterns\n5. Style rules\n"
+          "systemMessage": "=You are an expert Real Estate Intake Specialist. Your sole purpose is to qualify incoming leads effectively, professionally, and efficiently. You must strictly follow a logical decision tree to categorize the user.\n\n📌 OUTPUT FORMAT (CRITICAL)\nYou must ONLY output exactly one valid JSON object. Do not output any conversational text outside the JSON block.\nYour response must follow this schema:\n{\n  \"message\": \"String (The text reply to the client)\",\n  \"qualification_done\": boolean,\n  \"state\": {\n    \"user_role\": \"Self\" | \"Agent\" | null,\n    \"building_familiarity\": \"Yes\" | \"No\" | null,\n    \"payment_method\": \"Cash\" | \"Mortgage\" | null,\n    \"pre_approved\": \"Yes\" | \"No\" | null,\n    \"client_intent\": \"Investor\" | \"Self-Use\" | null,\n    \"off_topic_count\": integer (0 or 1)\n  },\n  \"summary\": \"String (Brief summary of collected data, only if qualification_done is true, otherwise null)\",\n  \"off_topic_redirect\": boolean (true ONLY if you are redirecting a distraction)\n}\n\n📌 CONVERSATION FLOW (STRICT)\nSTEP 1: \n  - Action: Start with a brief greeting (\"Hello.\") followed by the question: Are you looking for a property for yourself or are you an agent representing a client?\n  - Logic:\n    - If Agent: Set user_role = Agent. SKIP to STEP 3.\n    - If Self: Set user_role = Self. PROCEED to STEP 2.\n\nSTEP 2: Building Familiarity (Self Only)\n  - Action: Ask if they are familiar with the building.\n  - Logic:\n    - If Familiar: Set building_familiarity = Yes. PROCEED to STEP 3.\n    - If Not Familiar: Set building_familiarity = No. You must reply with SCRIPT A, then immediately append the question from STEP 3 in the same message string.\n\nSTEP 3: Payment Method\n  - Action: Ask if they (or their client) intend to pay via cash or mortgage.\n  - Logic:\n    - If user_role == Agent, adjust script to ask \"Is your client intending to pay via cash or mortgage?\"\n    - If mortgage: Set payment_method = Mortgage. PROCEED to STEP 4.\n    - If cash: Set payment_method = Cash.\n      - If user_role == Self: JUMP to STEP 7.\n      - If user_role == Agent: PROCEED to STEP 3.1.\n\nSTEP 3.1: Client Intent (Agent + Cash Only)\n  - Action: Ask if their client is an investor or looking to live in the property themselves.\n  - Logic:\n    -Once answered: Set client_intent variable. JUMP to STEP 7.\n\nSTEP 4: Pre-Approval (Mortgage Only)\n  - Action: Ask if they (or their client) have been pre-approved by a bank.\n  - Logic:\n    - If Yes: Set pre_approved = Yes. PROCEED to STEP 5.\n    - If No: Set pre_approved = No. JUMP to STEP 7.\n\nSTEP 5: Mortgage Education\n  - Action: Inform them about the limits using SCRIPT B. Ask if this works for them.\n  - Logic:\n    - Wait for the user’s acknowledgment (Yes/No/Maybe). \n    - Once received: PROCEED to STEP 7.\n\nSTEP 7: Closing & Handoff\n  - Action: Mark qualification as complete (qualification_done = true).\n  - Logic:\n    - If user_role == Self: Reply exactly with SCRIPT C.\n    - If user_role == Agent: Reply exactly with SCRIPT D.\n\n📌 MANDATORY SCRIPTS (VERBATIM)\nYou must use these exact phrases in the JSON message field when triggered.\n\nSCRIPT A (Step 2 - Not Familiar):\n\"No problem - I’ll send you the full presentation shortly.\"\n(Note: Immediately append the question about cash vs. mortgage).\n\nSCRIPT B (Step 5 - Mortgage Limits):\n\"Just so you know - mortgages for off-plan properties typically cover only around 50% of the value - the rest must be paid upfront. Would that work for you?\"\n(Note: Change \"for you\" to \"for your client\" if user_role == Agent).\n\nSCRIPT C (Step 7 - Closing for Self):\n\"Let me double-check a few things and I’ll get back to you shortly.\"\n\nSCRIPT D (Step 7 - Closing for Agent):\n\"Got it. I’ll double-check a couple of details, but meanwhile take a look at my property list below. Maybe something works for your other clients. Viewings anytime.\"\n\n📌 STYLE AND LANGUAGE CONTROL\n- Do NOT use polite softening phrases such as “may I”, “could you”, “would you”, “please”, “let me know”, “kindly”, “if you don’t mind”, or similar forms.\n- Avoid unnecessary courtesy.\n- Very short replies.\n- No enthusiasm or filler expressions.\n- Neutral, calm, business-like tone.\n- Use feminine form and pronouns in self-reference.\n- Do not use the word “qualification” in your replies (internal term only).\n- Always send \"message\" in the user’s language, regardless of the source language of mandatory scripts. If a mandatory script is provided in English, translate it into the user’s language while preserving exact meaning and tone.\n\n📌 RESILIENCE & JSON HANDLING guidelines\n1. State Tracking: Always output the current known state in the state object. If a field is unknown, keep it null.\n2. Handling Off-Topic Replies (Strict):\n  - Availability: If asked about property availability, confirm it is available, then immediately continue with the last unanswered question.\n  - Distractions:\n    - First Attempt: Reply: \"I'll provide all those details shortly,\" and repeat your pending question. Set off_topic_redirect: true and off_topic_count: 1 in the JSON.\n    - Second Attempt: If off_topic_count is 1 and they derail again, stop the process immediately. Set qualification_done: true and reply with Step 7.\n"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -988,7 +831,7 @@
           "conditions": [
             {
               "id": "f963525b-bfcb-4c42-8579-50155ff81786",
-              "leftValue": "={{ $json.output.keys().length }}",
+              "leftValue": "={{ $json.keys().length }}",
               "rightValue": 0,
               "operator": {
                 "type": "number",
@@ -1003,7 +846,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        -1648,
+        -1520,
         800
       ],
       "id": "eaec0392-fd58-483c-ae9f-49d1e3ac4a59",
@@ -1151,59 +994,6 @@
       ],
       "id": "9be55ee6-7196-44d7-a4b7-bd8c978a9d61",
       "name": "Gupshup Metadata"
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "https://api.gupshup.io/wa/api/v1/msg",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "apikey",
-              "value": "sk_2156c4ade66447249f5b2a862d9d58bc"
-            },
-            {
-              "name": "Content-Type",
-              "value": "application/x-www-form-urlencoded"
-            }
-          ]
-        },
-        "sendBody": true,
-        "bodyParameters": {
-          "parameters": [
-            {
-              "name": "source",
-              "value": "94743353842"
-            },
-            {
-              "name": "src.name",
-              "value": "REDstone"
-            },
-            {
-              "name": "destination",
-              "value": "={{ $('Client Data').first().json.phone_number }}"
-            },
-            {
-              "name": "message",
-              "value": "={{ $json.output.message }}"
-            },
-            {
-              "name": "channel",
-              "value": "whatsapp"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        -832,
-        432
-      ],
-      "id": "35fb316e-e1d8-411b-a0ca-a30ff5397000",
-      "name": "Send Gupshup Message"
     },
     {
       "parameters": {
@@ -1355,7 +1145,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -5712,
+        -5728,
         784
       ],
       "id": "2531f2c8-c75a-45b8-ab34-ef364a786613",
@@ -1460,14 +1250,14 @@
         "sendBody": true,
         "contentType": "raw",
         "rawContentType": "application/json",
-        "body": "={\n  \"to\": \"{{ $('Client Data').first().json.phone_number }}\", \n  \"text\": {{ JSON.stringify($json.output.message.replace('off_topic_redirect', '').trim()) }}\n}",
+        "body": "={\n  \"to\": \"{{ $('Client Data').first().json.phone_number }}\", \n  \"text\": {{ JSON.stringify($json.message) }}\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -992,
-        864
+        -960,
+        1088
       ],
       "id": "272f3659-8373-4fc7-abb4-69cbda880e09",
       "name": "Send WasenderApi Message"
@@ -1494,8 +1284,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -192,
-        352
+        896,
+        240
       ],
       "id": "08445b89-490a-4055-b74b-f32d8a280653",
       "name": "Send Qualified Client Message3"
@@ -1515,8 +1305,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -48,
-        928
+        -16,
+        1152
       ],
       "id": "56dcc994-9bf1-4d9a-92b3-76460d4c00be",
       "name": "Send WasenderApi Message1",
@@ -1733,8 +1523,8 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        -400,
-        928
+        -368,
+        1152
       ],
       "id": "cbf0c983-ee44-4aa0-a403-1d0e5a93d00f",
       "name": "Wait1",
@@ -1745,8 +1535,8 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        -400,
-        752
+        -368,
+        976
       ],
       "id": "e6fa2d01-5b05-44ce-8097-ca3dea5947e5",
       "name": "Wait2",
@@ -1764,8 +1554,8 @@
           "conditions": [
             {
               "id": "c9f6b181-02ae-4382-bd69-a677eeded558",
-              "leftValue": "={{ $('AI Agent').first().json.output.client_type }}",
-              "rightValue": "agent",
+              "leftValue": "={{ $('Parse to JSON').first().json.state_user_role }}",
+              "rightValue": "Agent",
               "operator": {
                 "type": "string",
                 "operation": "equals"
@@ -1779,8 +1569,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        -608,
-        752
+        -576,
+        976
       ],
       "id": "5004a3e0-5500-47d4-ace2-ee068d4cb792",
       "name": "Is Agent?"
@@ -1802,8 +1592,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -224,
-        752
+        -192,
+        976
       ],
       "id": "3662d937-b3a6-4b9a-8344-4aab19054237",
       "name": "Edit Fields"
@@ -1841,14 +1631,14 @@
         "sendBody": true,
         "contentType": "raw",
         "rawContentType": "application/json",
-        "body": "={\n  \"to\": \"{{ $('Client Data').first().json.phone_number }}\", \n  \"text\": {{ JSON.stringify($json.output.message.replace('off_topic_redirect', '').trim()) }}\n}",
+        "body": "={\n  \"to\": \"{{ $('Client Data').first().json.phone_number }}\", \n  \"text\": {{ JSON.stringify($json.message) }}\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -992,
-        688
+        -960,
+        512
       ],
       "id": "3e4d6a2a-e6a0-422f-82d7-19ecfc7186a3",
       "name": "Send WasenderApi Test Message"
@@ -1868,8 +1658,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -48,
-        752
+        -16,
+        976
       ],
       "id": "a48a7a53-1a1d-429f-bc2a-97781d3b3606",
       "name": "Send Followup Agent Message",
@@ -1916,65 +1706,6 @@
         }
       },
       "onError": "continueErrorOutput"
-    },
-    {
-      "parameters": {
-        "method": "PATCH",
-        "url": "={{ $('ENV Variables').first().json.is_test \n  ? $('ENV Variables').first().json.supabase_clients_url_test\n  : $('ENV Variables').first().json.supabase_clients_url\n}}",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
-        "sendQuery": true,
-        "queryParameters": {
-          "parameters": [
-            {
-              "name": "id",
-              "value": "=eq.{{ $('Client Data').first().json.id }}"
-            }
-          ]
-        },
-        "sendBody": true,
-        "contentType": "raw",
-        "rawContentType": "application/json",
-        "body": "={\n{{ ($json.output.qualification_done ? '\"qualification_done\": true,' : '') }}\n  \"reminder_sent\": false,\n  \"last_message_at\": \"{{ $now.toISO() }}\"\n}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        -1376,
-        1376
-      ],
-      "id": "067d54a3-574c-4320-b226-a3910b83a3fd",
-      "name": "Update Client1",
-      "credentials": {
-        "httpHeaderAuth": {
-          "id": "FAFnBfYyqTLXDpjY",
-          "name": "Kristina Dubai Supabase Auth Account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "721d1f9f-3b00-466e-9c61-123e8bb37bf8",
-              "name": "output.qualification_done",
-              "value": true,
-              "type": "boolean"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        -1600,
-        1392
-      ],
-      "id": "f0f39a79-de6c-4fcb-a788-8118206d9d75",
-      "name": "Edit Fields1"
     },
     {
       "parameters": {
@@ -2167,6 +1898,238 @@
       ],
       "id": "b63b5cf3-f6df-4c57-9158-ba74287a7c91",
       "name": "Message"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Client Data').first().json.phone_number }}",
+        "tableName": "kristina_dubai_chat_histories",
+        "contextWindowLength": 15
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        -1936,
+        1040
+      ],
+      "id": "f65a2223-09fc-4a04-8b04-0949431e16c5",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "dbUvQyOOeDxRzHfe",
+          "name": "ClientRecords"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract and parse only the required keys from the JSON string in 'output'\nreturn items.map(item => {\n  const parsed = JSON.parse(item.json.output);\n\n  return {\n    json: {\n      message: parsed.message,\n      qualification_done: parsed.qualification_done,\n      summary: parsed.summary,\n      off_topic_redirect: parsed.off_topic_redirect,\n      \n      // Nested structure flattened for convenience\n      state_user_role: parsed.state?.user_role,\n      state_building_familiarity: parsed.state?.building_familiarity,\n      state_payment_method: parsed.state?.payment_method,\n      state_pre_approved: parsed.state?.pre_approved,\n      state_client_intent: parsed.state?.client_intent,\n      state_off_topic_count: parsed.state?.off_topic_count\n    }\n  }\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1680,
+        800
+      ],
+      "id": "3f446d40-d9d3-4f85-ac17-7c41a9be3908",
+      "name": "Parse to JSON",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0312def6-af7b-49a7-bf78-0ba01ca99b5e",
+              "leftValue": "={{ $('Parse to JSON').first().json.qualification_done }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -784,
+        528
+      ],
+      "id": "d4f36827-9ab2-4c72-b327-cf01a1a579f3",
+      "name": "Client Qualified1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const formatForWhatsApp = (\n  {\n    state_user_role, \n    state_payment_method, \n    state_building_familiarity, \n    state_client_intent, \n    summary\n  }, \n  phone_number\n) => {\n  return `1. *Client Type*: ${capitalize(state_user_role)}\\n` +\n         `2. *Payment*: ${capitalize(state_payment_method)}\\n` +\n         `3. *Knows The Property*: ${capitalizeYesNo(state_building_familiarity)}\\n` +\n         `4. *Intent*: ${capitalize(state_client_intent)}\\n` +\n         `5. *Summary*: ${summary}\\n` +\n         `6. *Chat*: https://wa.me/${phone_number}`\n}\n\nconst capitalize = str => !str ? '—' : str.charAt(0).toUpperCase() + str.slice(1)\nconst capitalizeYesNo = str => str === 'Yes' ? 'Yes' : str === 'No' ? 'No' : capitalize(str)\n\nconst ai = $('Parse to JSON').first().json\nconst phone = $('Client Data').first().json.phone_number\n\nconst message = formatForWhatsApp(ai, phone)\n\nreturn [{ message }]\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -576,
+        608
+      ],
+      "id": "40816308-15cd-4daf-98b2-6ded77087556",
+      "name": "Create Qualification Message1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://wasenderapi.com/api/send-message",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $('ENV Variables').first().json.wasender_api_key }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={  \n  \"to\": \"120363422005783387@g.us\",   \n  \"text\": {{ JSON.stringify($json.message) }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -16,
+        608
+      ],
+      "id": "f0d5b795-3d92-4cb1-bcf4-dbc5769f09f0",
+      "name": "Send WasenderApi Message2"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -368,
+        608
+      ],
+      "id": "03f75e61-dc6a-4c38-86cd-6c6f23e47872",
+      "name": "Wait3",
+      "webhookId": "4a1f46c3-9962-459a-a3e3-ee71367fac44"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -368,
+        432
+      ],
+      "id": "3f4d6a45-43de-4388-bdda-894a7b37cdae",
+      "name": "Wait4",
+      "webhookId": "8b8f2299-eea8-4780-b030-010a88097a0b"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c9f6b181-02ae-4382-bd69-a677eeded558",
+              "leftValue": "={{ $('Parse to JSON').first().json.state_user_role }}",
+              "rightValue": "Agent",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -576,
+        432
+      ],
+      "id": "5b7e8741-5d19-4a2b-b6b9-8068fd3999b6",
+      "name": "Is Agent?1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "698e79c1-c99d-4b13-9b99-c03146d8a31b",
+              "name": "agent_message",
+              "value": "*Fully customizable follow-up message*\nReady apartments with 2 years post-handover payment plan \n • 1 BDR – from 2M\n • 2 BDR – 3M\n • 3 BDR – 4M\n👉 https://example-link.com\n\n👉 PHOTO https://example-link.com\n👉 VIDEO https://example-link.com",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -192,
+        432
+      ],
+      "id": "3f7d7b3d-39c2-46ae-ab59-b31908711285",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://wasenderapi.com/api/send-message",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $('ENV Variables').first().json.wasender_api_key }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={\n  \"to\": \"{{ $('Client Data').first().json.phone_number }}\", \n  \"text\": {{ JSON.stringify($json.agent_message) }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -16,
+        432
+      ],
+      "id": "7cfdde6d-a4a6-4787-aed8-58361f8c56fc",
+      "name": "Send Followup Agent Message1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -784,
+        688
+      ],
+      "id": "486e883d-c702-4ec9-9c12-0664f19f836c",
+      "name": "No Operation, do nothing"
     }
   ],
   "pinData": {
@@ -2408,64 +2371,6 @@
         }
       }
     ],
-    "WasenderAPI Message": [
-      {
-        "json": {
-          "headers": {
-            "host": "n8n.orbitalgarden.space",
-            "user-agent": "axios/1.12.2",
-            "content-length": "779",
-            "accept": "application/json, text/plain, */*",
-            "accept-encoding": "gzip, compress, deflate, br",
-            "content-type": "application/json",
-            "via": "1.1 Caddy",
-            "x-forwarded-for": "72.60.126.115",
-            "x-forwarded-host": "n8n.orbitalgarden.space",
-            "x-forwarded-proto": "https",
-            "x-webhook-signature": "08139d3542aba3cba134211058ea6a6f"
-          },
-          "params": {},
-          "query": {},
-          "body": {
-            "event": "messages.received",
-            "sessionId": "31f80b7c5666626556ae8960357445868e2bc15b8530c964663e7cf8565e618c",
-            "data": {
-              "messages": {
-                "key": {
-                  "remoteJid": "144684596883503@s.whatsapp.net",
-                  "fromMe": false,
-                  "id": "3A42EA3E98AC3AE87575",
-                  "senderLid": "144684596883503@lid",
-                  "senderPn": "19808002209@s.whatsapp.net",
-                  "cleanedSenderPn": "19808002209",
-                  "addressingMode": "lid"
-                },
-                "messageTimestamp": 1761674527,
-                "pushName": "TD",
-                "broadcast": false,
-                "message": {
-                  "conversation": "Hi gorgeous",
-                  "messageContextInfo": {
-                    "deviceListMetadata": {
-                      "senderTimestamp": "1761668966",
-                      "recipientKeyHash": "mijkDIy2KKIJQg==",
-                      "recipientTimestamp": "1760772319"
-                    },
-                    "deviceListMetadataVersion": 2,
-                    "messageSecret": "xcD0KxYyjJbM7SavRrIk1OPnLUmwrkvoTWLBMFn48to="
-                  }
-                },
-                "remoteJid": "144684596883503@s.whatsapp.net",
-                "id": "3A42EA3E98AC3AE87575"
-              }
-            },
-            "timestamp": 1761674527424
-          },
-          "webhookUrl": "https://n8n.orbitalgarden.space/webhook/kristina_dubai",
-          "executionMode": "production"
-        }
-      }
-    ],
     "WasenderAPI Test Message": [
       {
         "json": {
@@ -2525,6 +2430,67 @@
           "executionMode": "production"
         }
       }
+    ],
+    "WasenderAPI Message": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.orbitalgarden.space",
+            "user-agent": "axios/1.12.2",
+            "content-length": "1013",
+            "accept": "application/json, text/plain, */*",
+            "accept-encoding": "gzip, compress, deflate, br",
+            "content-type": "application/json",
+            "via": "1.1 Caddy",
+            "x-forwarded-for": "82.25.92.152",
+            "x-forwarded-host": "n8n.orbitalgarden.space",
+            "x-forwarded-proto": "https",
+            "x-webhook-signature": "08139d3542aba3cba134211058ea6a6f"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "event": "messages.received",
+            "sessionId": "31f80b7c5666626556ae8960357445868e2bc15b8530c964663e7cf8565e618c",
+            "data": {
+              "messages": {
+                "key": {
+                  "id": "2A10181E59C986D11F76",
+                  "fromMe": false,
+                  "remoteJid": "971565500570@s.whatsapp.net",
+                  "senderPn": "971565500570@s.whatsapp.net",
+                  "cleanedSenderPn": "971565500570",
+                  "senderLid": "93811111923925@lid",
+                  "addressingMode": "pn"
+                },
+                "messageTimestamp": 1764054338,
+                "pushName": "Rabiya Bukhari",
+                "broadcast": false,
+                "message": {
+                  "conversation": "It can be for both purposes for rental and investment purpose too",
+                  "messageContextInfo": {
+                    "deviceListMetadata": {
+                      "senderKeyHash": "6/6QVeudRDTAgw==",
+                      "senderTimestamp": "1763110474",
+                      "recipientKeyHash": "9aHRR9sJZDtlag==",
+                      "recipientTimestamp": "1763891586"
+                    },
+                    "deviceListMetadataVersion": 2,
+                    "messageSecret": "BThsNQNKZjYe0xDDTp9kqfBkZismoLjrGZ2OT9qBJgs="
+                  }
+                },
+                "verifiedBizName": "Rabiya Bukhari",
+                "messageBody": "It can be for both purposes for rental and investment purpose too",
+                "remoteJid": "971565500570@s.whatsapp.net",
+                "id": "2A10181E59C986D11F76"
+              }
+            },
+            "timestamp": 1764054338360
+          },
+          "webhookUrl": "https://n8n.orbitalgarden.space/webhook/kristina_dubai",
+          "executionMode": "production"
+        }
+      }
     ]
   },
   "connections": {
@@ -2534,17 +2500,6 @@
           {
             "node": "AI Agent",
             "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Structured Output Parser": {
-      "ai_outputParser": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_outputParser",
             "index": 0
           }
         ]
@@ -2567,17 +2522,6 @@
         [
           {
             "node": "No Operation, do nothing3",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Wait": {
-      "main": [
-        [
-          {
-            "node": "Update Client",
             "type": "main",
             "index": 0
           }
@@ -2647,22 +2591,6 @@
         ]
       ]
     },
-    "Get Chat Messages": {
-      "main": [
-        [
-          {
-            "node": "Chat History String",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Get Messages Buffer",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Get Latest Message Stack": {
       "main": [
         [
@@ -2678,7 +2606,7 @@
       "main": [
         [
           {
-            "node": "Get Chat Messages",
+            "node": "Get Messages Buffer",
             "type": "main",
             "index": 0
           }
@@ -2717,11 +2645,6 @@
             "node": "AI Agent",
             "type": "main",
             "index": 0
-          },
-          {
-            "node": "Add Client Message",
-            "type": "main",
-            "index": 0
           }
         ]
       ]
@@ -2741,7 +2664,7 @@
       "main": [
         [
           {
-            "node": "Output Not Empty?",
+            "node": "Parse to JSON",
             "type": "main",
             "index": 0
           }
@@ -2815,12 +2738,7 @@
             "index": 0
           },
           {
-            "node": "Wait",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Add Assistant Message",
+            "node": "Update Client",
             "type": "main",
             "index": 0
           }
@@ -3064,17 +2982,6 @@
         ]
       ]
     },
-    "Edit Fields1": {
-      "main": [
-        [
-          {
-            "node": "Update Client1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Type": {
       "main": [
         [
@@ -3125,13 +3032,124 @@
           }
         ]
       ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse to JSON": {
+      "main": [
+        [
+          {
+            "node": "Output Not Empty?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Client Qualified1": {
+      "main": [
+        [
+          {
+            "node": "Is Agent?1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create Qualification Message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Qualification Message1": {
+      "main": [
+        [
+          {
+            "node": "Wait3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait3": {
+      "main": [
+        [
+          {
+            "node": "Send WasenderApi Message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait4": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Agent?1": {
+      "main": [
+        [
+          {
+            "node": "Wait4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Send Followup Agent Message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send WasenderApi Test Message": {
+      "main": [
+        [
+          {
+            "node": "Client Qualified1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-  "active": true,
+  "active": false,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "6dcc8de2-d62d-45c4-9bcd-8c6dfe2eaec0",
+  "versionId": "f109712f-73a7-431a-b538-2331a99d2f03",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "c9e53a150db3979558dce85b88732650eafd440e09b4690afc30683da1136ad9"
@@ -3139,8 +3157,8 @@
   "id": "2H4JCsV0zge66tTv",
   "tags": [
     {
-      "createdAt": "2025-09-14T12:25:31.358Z",
       "updatedAt": "2025-09-14T12:25:31.358Z",
+      "createdAt": "2025-09-14T12:25:31.358Z",
       "id": "oi3mfeDHd8seIZYf",
       "name": "latest"
     }
