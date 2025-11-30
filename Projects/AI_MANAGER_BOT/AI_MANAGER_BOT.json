@@ -1,0 +1,1555 @@
+{
+  "name": "AI Manager Bot",
+  "nodes": [
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Message').first().json.message.voice }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    },
+                    "id": "8aca7578-9229-4a4b-9c0a-c6f0070e5f3e"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "voice"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "d6282c7e-e90b-46d0-b97d-5bee4f47a740",
+                    "leftValue": "={{ $('Message').first().json.message.photo }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "array",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "74466aa2-0303-4eec-919c-4946eb8125ef",
+                    "leftValue": "={{ $('Message').first().json.callback_query }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "callback"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "40617890-25f8-4240-a1b4-2d38f4b47ab0",
+                    "leftValue": "={{ ['/start', '⚙️ Settings', '❓ Help'] }}",
+                    "rightValue": "={{ $('Message').first().json.message.text }}",
+                    "operator": {
+                      "type": "array",
+                      "operation": "contains",
+                      "rightType": "any"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "button"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "59e93185-d2c1-429d-9979-fa8a0b4dfb9c",
+                    "leftValue": "={{ $('Message').first().json.message.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "cb28ee94-7716-4732-b54e-b5239d7c73ab",
+                    "leftValue": "unknown",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "unknown"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        512,
+        -208
+      ],
+      "id": "6be0f44f-50b7-4d23-8390-0b6bd2d3b8df",
+      "name": "Type"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Message').first().json.message.chat.id }}",
+        "text": "=Please enter password",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1744,
+        -896
+      ],
+      "id": "c0fce1f2-8191-4f68-8c22-46d70c014fc3",
+      "name": "Ask Password",
+      "webhookId": "8f24d875-0c53-4705-8100-e798f5ee1b6c",
+      "credentials": {
+        "telegramApi": {
+          "id": "RjFhbLnDMoH8VW2V",
+          "name": "AI Manager Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://fmvzsfizkiimeavbdton.supabase.co/rest/v1/MANAGER_users",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "telegram_id",
+              "value": "=eq.{{ $('Message').first().json.message.chat.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -256,
+        -144
+      ],
+      "id": "a55b904f-7395-4df9-844e-32c9ecc4c6d7",
+      "name": "Get User",
+      "alwaysOutputData": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "woWs2SoFYkGNkCXD",
+          "name": "ClientRecords Supabase Auth Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3efef8df-f06d-4bf5-b433-4be4981afc58",
+              "name": "user_exists",
+              "value": "={{ Object.keys($json).length != 0 }}",
+              "type": "boolean"
+            },
+            {
+              "id": "bd4325d8-5ade-490d-bdce-d3aab30de42f",
+              "name": "role",
+              "value": "={{ $json.role }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -48,
+        -144
+      ],
+      "id": "40e792d3-a252-4e55-99cb-60233ca6e905",
+      "name": "User Data"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message",
+          "callback_query"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -480,
+        -144
+      ],
+      "id": "43f0eb82-f88b-42f9-9e8c-d2e715de0ba4",
+      "name": "Message",
+      "webhookId": "238d3858-824e-4826-acd4-e8bb17f8eed7",
+      "credentials": {
+        "telegramApi": {
+          "id": "RjFhbLnDMoH8VW2V",
+          "name": "AI Manager Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Message').first().json.message.chat.id }}",
+        "text": "=ℹ️ You are already logged in",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1744,
+        -1072
+      ],
+      "id": "c5c16def-7436-4ecb-9ca5-ecaf7f382895",
+      "name": "Already Logged In",
+      "webhookId": "8f24d875-0c53-4705-8100-e798f5ee1b6c",
+      "credentials": {
+        "telegramApi": {
+          "id": "RjFhbLnDMoH8VW2V",
+          "name": "AI Manager Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a2929813-353d-4419-ac45-1962d31134cb",
+              "leftValue": "={{ Object.keys($json).length != 0 }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1552,
+        480
+      ],
+      "id": "560dd8c1-82a1-464c-aa6b-a30273e235f2",
+      "name": "Correct Password?"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Message').first().json.message.chat.id }}",
+        "text": "=❌ Incorrect password, try again",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1984,
+        576
+      ],
+      "id": "86e48344-2aa3-4424-aeb2-a107045c9378",
+      "name": "Incorrect Password",
+      "webhookId": "8f24d875-0c53-4705-8100-e798f5ee1b6c",
+      "credentials": {
+        "telegramApi": {
+          "id": "RjFhbLnDMoH8VW2V",
+          "name": "AI Manager Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://fmvzsfizkiimeavbdton.supabase.co/rest/v1/MANAGER_users",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={\n  \"telegram_id\": \"{{ $('Message').first().json.message.chat.id }}\",\n  \"project_id\": \"{{ $('Get Project By Password').first().json.id }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1776,
+        416
+      ],
+      "id": "49cb0690-0fe9-40b7-804e-4a0f4077dc8b",
+      "name": "Create User",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "woWs2SoFYkGNkCXD",
+          "name": "ClientRecords Supabase Auth Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## VERIFY Password\n### Assign user to project if password correct\n",
+        "height": 400,
+        "width": 1088,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1296,
+        368
+      ],
+      "typeVersion": 1,
+      "id": "98fc5bd5-ebd2-4ce0-abd9-dd0c002bc598",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a891a2ed-0823-4705-aab8-d2c287453812",
+              "leftValue": "={{ $('User Data').first().json.user_exists }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1040,
+        80
+      ],
+      "id": "9da3b15b-78bb-410a-990b-91eb3da5dd9e",
+      "name": "User Already Created"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Message').first().json.message.chat.id }}",
+        "text": "=✅ You are now authorized to manage stop list of <b>\"{{ $('Get Project By Password').item.json.name }}\"</b>\n\n💡 Accepted formats:\n  • https://www.instagram.com/username  \n  • @username  \n  • username",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1984,
+        416
+      ],
+      "id": "3f4577ad-e551-46be-b632-6e090de48311",
+      "name": "User Created",
+      "webhookId": "8f24d875-0c53-4705-8100-e798f5ee1b6c",
+      "credentials": {
+        "telegramApi": {
+          "id": "RjFhbLnDMoH8VW2V",
+          "name": "AI Manager Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://fmvzsfizkiimeavbdton.supabase.co/rest/v1/MANAGER_projects",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "password",
+              "value": "=eq.{{ $('Message').first().json.message.text }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1344,
+        480
+      ],
+      "id": "e539098b-2fc0-44c9-84ac-3035055c2b4b",
+      "name": "Get Project By Password",
+      "alwaysOutputData": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "woWs2SoFYkGNkCXD",
+          "name": "ClientRecords Supabase Auth Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://fmvzsfizkiimeavbdton.supabase.co/rest/v1/MANAGER_projects",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "id",
+              "value": "=eq.{{ $('Get User').first().json.project_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1344,
+        -32
+      ],
+      "id": "1f4e08d2-089a-4d08-a196-0eead342f698",
+      "name": "Get Project",
+      "alwaysOutputData": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "woWs2SoFYkGNkCXD",
+          "name": "ClientRecords Supabase Auth Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5d9d5ff7-0f43-48b5-869d-64192e99a8c3",
+              "leftValue": "={{ $json.usernames.length != 0 }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1952,
+        -32
+      ],
+      "id": "31b86534-7a6c-4b65-88c3-a7c8dfd5d574",
+      "name": "Valid"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Message').first().json.message.chat.id }}",
+        "text": "=❌ Invalid username provided, try again",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2176,
+        144
+      ],
+      "id": "2ac0275e-6e56-49d7-8384-4454f3f2cce9",
+      "name": "Invalid Username",
+      "webhookId": "8f24d875-0c53-4705-8100-e798f5ee1b6c",
+      "credentials": {
+        "telegramApi": {
+          "id": "RjFhbLnDMoH8VW2V",
+          "name": "AI Manager Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "input_type",
+              "value": "button"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        1248,
+        -960
+      ],
+      "id": "45c586ee-b602-4194-aa26-0edd5daca7eb",
+      "name": "[LOG] Input Type Button"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "input_type",
+              "value": "text"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        816,
+        80
+      ],
+      "id": "c50e53dd-123a-466d-b74b-4b42932f8983",
+      "name": "[LOG] Input Type Text"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "event",
+              "value": "USER_CREATED"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        2160,
+        416
+      ],
+      "id": "644052a7-c16f-49b7-ac10-43ecfad7c1b8",
+      "name": "[LOG] Event USER CREATED"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "project",
+              "value": "={{ $json.name }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        1552,
+        -32
+      ],
+      "id": "f333a393-d494-4545-9193-993204862197",
+      "name": "[LOG] Project Name"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://fmvzsfizkiimeavbdton.supabase.co/rest/v1/{{ $('Get Project').first().json.clients_table }}?on_conflict=client_username",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates,return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify($json.usernames.map(n => ({ client_username: n, state: 'closed' }))) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2176,
+        -144
+      ],
+      "id": "6846a6ae-e5d4-4d01-97e6-23cc8e0cc184",
+      "name": "Add To Stop List",
+      "alwaysOutputData": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "woWs2SoFYkGNkCXD",
+          "name": "ClientRecords Supabase Auth Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "event",
+              "value": "INVALID_STOP_ENTRY"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        2432,
+        144
+      ],
+      "id": "7a510bb1-1999-4628-a6b7-0b49034ea164",
+      "name": "[LOG] Event INVALID STOP ENTRY"
+    },
+    {
+      "parameters": {
+        "content": "## Buttons",
+        "height": 400,
+        "width": 752,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1184,
+        -1120
+      ],
+      "typeVersion": 1,
+      "id": "78a1b119-a77e-4f69-bb7c-e6e07d742690",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// The input will be the value of the 'text' key from the first item\nconst inputValue = $('Message').first().json.message.text; \nlet cleanUsernames = [];\n\n// 1. Check for null, undefined, or empty string input\nif (!inputValue || typeof inputValue !== 'string' || inputValue.trim() === '') {\n    return [\n        {\n            json: null\n        }\n    ];\n}\n\n// 2. Split the string by comma, and trim whitespace from each potential item\nconst items = inputValue.split(',').map(item => item.trim());\n\n// 3. Regex to clean and validate Instagram usernames\nconst instagramRegex = /^(?:https?:\\/\\/(?:www\\.)?instagram\\.com\\/|@)?([a-zA-Z0-9._]+)(?:[/?#].*)?$/i;\n\n// Regex to check if the captured group is a valid Instagram username format (A-Z, a-z, 0-9, periods, underscores)\n// Instagram usernames can be up to 30 characters long, and cannot start or end with a period.\nconst usernameValidationRegex = /^[a-zA-Z0-9_]{1,30}$|^[a-zA-Z0-9](?:[a-zA-Z0-9._]*[a-zA-Z0-9])?$/;\n\n\nfor (const item of items) {\n    if (item === '') continue; // Skip empty strings resulting from multiple commas\n\n    const match = item.match(instagramRegex);\n\n    if (match && match[1]) {\n        let username = match[1];\n\n        // The main goal is to clean the username from common invalid characters like trailing slashes or other symbols that sometimes remain, \n        // though the regex above is quite robust. We also ensure it meets the basic format requirements.\n\n        // Further check for basic Instagram username validity (e.g., must be short, contain valid chars)\n        if (username.length > 30) {\n            // Instagram usernames are max 30 characters\n            continue; \n        }\n\n        // Apply a strict validation check\n        if (usernameValidationRegex.test(username)) {\n            cleanUsernames.push(username.toLowerCase());\n        }\n    }\n}\n\n// 4. Remove duplicates and return the result\n\n// Create a Set to automatically remove duplicates\nconst uniqueUsernames = [...new Set(cleanUsernames)];\n\n// 5. Return either the array or null if no valid usernames were found\nconst finalResult = uniqueUsernames.length > 0 ? uniqueUsernames : [];\n\n// n8n function nodes must return an array of objects\nreturn [\n    {\n        json: {\n          usernames: finalResult\n        }\n    }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        -32
+      ],
+      "id": "b48a1483-5594-46a4-86f2-48f7e3ab9611",
+      "name": "Get Usernames Array",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "content": "## PROCESS Stop List Request",
+        "height": 704,
+        "width": 1984,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1296,
+        -384
+      ],
+      "typeVersion": 1,
+      "id": "29d84ba1-c539-42cc-a93c-ab7927f88c88",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Message').first().json.message.chat.id }}",
+        "text": "=⚠️ Unsupported message, only text messages are supported",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        816,
+        -160
+      ],
+      "id": "a891dc9b-1556-46d9-a77d-316f12a21d38",
+      "name": "Unsupported Type",
+      "webhookId": "8f24d875-0c53-4705-8100-e798f5ee1b6c",
+      "credentials": {
+        "telegramApi": {
+          "id": "RjFhbLnDMoH8VW2V",
+          "name": "AI Manager Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "input_type",
+              "value": "unsupported"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        1040,
+        -160
+      ],
+      "id": "1bf8143e-1689-4093-af71-28996453754e",
+      "name": "[LOG] Input Type Unsupported"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "event",
+              "value": "SUCC_STOP_LIST"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        2640,
+        -368
+      ],
+      "id": "2f5757ae-5403-419e-9418-a2d3c9027e6d",
+      "name": "[LOG] Event SUCC STOP LIST"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "event",
+              "value": "FAIL_STOP_LIST"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        2640,
+        0
+      ],
+      "id": "ef2a4d59-2397-4f4a-a4c2-70eaf8ce78b3",
+      "name": "[LOG] Event FAIL STOP LIST"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Message').first().json.message.chat.id }}",
+        "text": "=✅ Added to stop list:\n@{{ $json.client_username }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2848,
+        -368
+      ],
+      "id": "e91f0e2f-f763-4651-aeab-7a85a2ad36f2",
+      "name": "Successful Stop Request",
+      "webhookId": "8f24d875-0c53-4705-8100-e798f5ee1b6c",
+      "credentials": {
+        "telegramApi": {
+          "id": "RjFhbLnDMoH8VW2V",
+          "name": "AI Manager Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Message').first().json.message.chat.id }}",
+        "text": "=❗ Internal error has occured, try again",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2848,
+        0
+      ],
+      "id": "2d983e1c-d0a7-4bc2-9dd7-2ebeb1c81a6e",
+      "name": "Failed Stop Request",
+      "webhookId": "8f24d875-0c53-4705-8100-e798f5ee1b6c",
+      "credentials": {
+        "telegramApi": {
+          "id": "RjFhbLnDMoH8VW2V",
+          "name": "AI Manager Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## AI Manager Bot\n### Features:\n* Handling stop list requests for IG users",
+        "width": 400,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1072,
+        -192
+      ],
+      "typeVersion": 1,
+      "id": "90b1c25a-8c1b-4464-aad5-365b077fed5e",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4f495860-be46-4bfc-a77e-4022524fde3b",
+              "leftValue": "={{ Object.keys($json).length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2384,
+        -240
+      ],
+      "id": "8781192e-5180-4d79-a104-87f96ee675b1",
+      "name": "User Found?"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "event",
+              "value": "STOP_USER_NOT_FOUND"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        2640,
+        -192
+      ],
+      "id": "e939f5ab-d624-4248-bd8b-b9b0f1229ff1",
+      "name": "[LOG] Event STOP USER NOT FOUND"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Message').first().json.message.chat.id }}",
+        "text": "=⚠️ User with the following username was not found:\n@{{ $('Get Usernames Array').first().json.usernames.join(',') }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2848,
+        -192
+      ],
+      "id": "d5286f77-c80b-4fb8-a0de-5e3b22bdbf0c",
+      "name": "User Not Found",
+      "webhookId": "8f24d875-0c53-4705-8100-e798f5ee1b6c",
+      "credentials": {
+        "telegramApi": {
+          "id": "RjFhbLnDMoH8VW2V",
+          "name": "AI Manager Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://fmvzsfizkiimeavbdton.supabase.co/rest/v1/{{ $('Get Project').first().json.clients_table }}?client_username=in.({{ $json.usernames.join(',') }})",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={ \"state\": \"closed\" }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2160,
+        -384
+      ],
+      "id": "058b5a8c-4bd8-48ff-9054-2f94bd61b91a",
+      "name": "Add To Stop List1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "woWs2SoFYkGNkCXD",
+          "name": "ClientRecords Supabase Auth Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Message').first().json.message.chat.id }}",
+        "text": "=⚠️ Service is under maintenance, try again after a few minutes",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        192,
+        32
+      ],
+      "id": "85865369-4f55-4ede-92db-5c35ca6ce9bb",
+      "name": "Maintenance",
+      "webhookId": "8f24d875-0c53-4705-8100-e798f5ee1b6c",
+      "credentials": {
+        "telegramApi": {
+          "id": "RjFhbLnDMoH8VW2V",
+          "name": "AI Manager Bot"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b98b4a00-f315-47bb-8c0e-c63f767eba66",
+              "leftValue": "={{ $json.role }}",
+              "rightValue": "admin",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        192,
+        -144
+      ],
+      "id": "7e4418d0-fea7-4605-9522-92629a2cd296",
+      "name": "Admin?",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## Enable During Maintenance",
+        "height": 400,
+        "width": 336,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        80,
+        -208
+      ],
+      "typeVersion": 1,
+      "id": "e19b3a22-b719-4927-b362-ca4fad196495",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "39ac583c-49d3-4709-9e18-e441e2b4a9ad",
+              "leftValue": "={{ $('User Data').first().json.user_exists }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1472,
+        -960
+      ],
+      "id": "2eed25e4-0025-4ad6-8eaa-1a9b72e3d3e6",
+      "name": "User Already Created1"
+    }
+  ],
+  "pinData": {
+    "Message": [
+      {
+        "json": {
+          "update_id": 641698656,
+          "message": {
+            "message_id": 41,
+            "from": {
+              "id": 503775021,
+              "is_bot": false,
+              "first_name": "Максим",
+              "username": "pplpls",
+              "language_code": "en"
+            },
+            "chat": {
+              "id": 503775021,
+              "first_name": "Максим",
+              "username": "pplpls",
+              "type": "private"
+            },
+            "date": 1762709279,
+            "text": "maqs.oh"
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Type": {
+      "main": [
+        [
+          {
+            "node": "Unsupported Type",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unsupported Type",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unsupported Type",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "[LOG] Input Type Button",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "[LOG] Input Type Text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unsupported Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get User": {
+      "main": [
+        [
+          {
+            "node": "User Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "User Data": {
+      "main": [
+        [
+          {
+            "node": "Admin?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message": {
+      "main": [
+        [
+          {
+            "node": "Get User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Correct Password?": {
+      "main": [
+        [
+          {
+            "node": "Create User",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Incorrect Password",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "User Already Created": {
+      "main": [
+        [
+          {
+            "node": "Get Project",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Project By Password",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create User": {
+      "main": [
+        [
+          {
+            "node": "User Created",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Project By Password": {
+      "main": [
+        [
+          {
+            "node": "Correct Password?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Project": {
+      "main": [
+        [
+          {
+            "node": "[LOG] Project Name",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Valid": {
+      "main": [
+        [
+          {
+            "node": "Add To Stop List",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Invalid Username",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "User Created": {
+      "main": [
+        [
+          {
+            "node": "[LOG] Event USER CREATED",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "[LOG] Input Type Button": {
+      "main": [
+        [
+          {
+            "node": "User Already Created1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "[LOG] Input Type Text": {
+      "main": [
+        [
+          {
+            "node": "User Already Created",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "[LOG] Project Name": {
+      "main": [
+        [
+          {
+            "node": "Get Usernames Array",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Invalid Username": {
+      "main": [
+        [
+          {
+            "node": "[LOG] Event INVALID STOP ENTRY",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add To Stop List": {
+      "main": [
+        [
+          {
+            "node": "User Found?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "[LOG] Event FAIL STOP LIST",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Usernames Array": {
+      "main": [
+        [
+          {
+            "node": "Valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unsupported Type": {
+      "main": [
+        [
+          {
+            "node": "[LOG] Input Type Unsupported",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "[LOG] Event SUCC STOP LIST": {
+      "main": [
+        [
+          {
+            "node": "Successful Stop Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "[LOG] Event FAIL STOP LIST": {
+      "main": [
+        [
+          {
+            "node": "Failed Stop Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "User Found?": {
+      "main": [
+        [
+          {
+            "node": "[LOG] Event SUCC STOP LIST",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "[LOG] Event STOP USER NOT FOUND": {
+      "main": [
+        [
+          {
+            "node": "User Not Found",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Admin?": {
+      "main": [
+        [
+          {
+            "node": "Type",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Maintenance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "User Already Created1": {
+      "main": [
+        [
+          {
+            "node": "Already Logged In",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ask Password",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5dfdda44-2a43-43e4-956c-d85c375d85ae",
+  "meta": {
+    "instanceId": "c9e53a150db3979558dce85b88732650eafd440e09b4690afc30683da1136ad9"
+  },
+  "id": "WVTGQyanDAXZXvpX",
+  "tags": [
+    {
+      "updatedAt": "2025-09-28T13:29:18.545Z",
+      "createdAt": "2025-09-28T13:29:18.545Z",
+      "id": "5987uhWbKzSKbQsw",
+      "name": "UTILITY"
+    },
+    {
+      "updatedAt": "2025-11-09T10:59:34.924Z",
+      "createdAt": "2025-11-09T10:59:34.924Z",
+      "id": "QFTod1dGNRuhgrq3",
+      "name": "Telegram"
+    }
+  ]
+}
