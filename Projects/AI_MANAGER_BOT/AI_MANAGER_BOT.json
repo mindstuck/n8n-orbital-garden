@@ -1,5 +1,5 @@
 {
-  "name": "AI Manager Bot",
+  "name": "AI_MANAGER_BOT",
   "nodes": [
     {
       "parameters": {
@@ -91,7 +91,7 @@
                 "conditions": [
                   {
                     "id": "40617890-25f8-4240-a1b4-2d38f4b47ab0",
-                    "leftValue": "={{ ['/start', '⚙️ Settings', '❓ Help'] }}",
+                    "leftValue": "={{ ['/start', '/menu'] }}",
                     "rightValue": "={{ $('Message').first().json.message.text }}",
                     "operator": {
                       "type": "array",
@@ -162,36 +162,11 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.2,
       "position": [
-        512,
+        720,
         -208
       ],
       "id": "6be0f44f-50b7-4d23-8390-0b6bd2d3b8df",
       "name": "Type"
-    },
-    {
-      "parameters": {
-        "chatId": "={{ $('Message').first().json.message.chat.id }}",
-        "text": "=Please enter password",
-        "additionalFields": {
-          "appendAttribution": false,
-          "parse_mode": "HTML"
-        }
-      },
-      "type": "n8n-nodes-base.telegram",
-      "typeVersion": 1.2,
-      "position": [
-        1744,
-        -896
-      ],
-      "id": "c0fce1f2-8191-4f68-8c22-46d70c014fc3",
-      "name": "Ask Password",
-      "webhookId": "8f24d875-0c53-4705-8100-e798f5ee1b6c",
-      "credentials": {
-        "telegramApi": {
-          "id": "RjFhbLnDMoH8VW2V",
-          "name": "AI Manager Bot"
-        }
-      }
     },
     {
       "parameters": {
@@ -203,7 +178,7 @@
           "parameters": [
             {
               "name": "telegram_id",
-              "value": "=eq.{{ $('Message').first().json.message.chat.id }}"
+              "value": "=eq.{{ $json.fromId }}"
             }
           ]
         },
@@ -212,7 +187,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -256,
+        -48,
         -144
       ],
       "id": "a55b904f-7395-4df9-844e-32c9ecc4c6d7",
@@ -248,7 +223,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -48,
+        160,
         -144
       ],
       "id": "40e792d3-a252-4e55-99cb-60233ca6e905",
@@ -265,7 +240,7 @@
       "type": "n8n-nodes-base.telegramTrigger",
       "typeVersion": 1.2,
       "position": [
-        -480,
+        -496,
         -144
       ],
       "id": "43f0eb82-f88b-42f9-9e8c-d2e715de0ba4",
@@ -280,7 +255,7 @@
     },
     {
       "parameters": {
-        "chatId": "={{ $('Message').first().json.message.chat.id }}",
+        "chatId": "={{ $('fromId').first().json.fromId }}",
         "text": "=ℹ️ You are already logged in",
         "additionalFields": {
           "appendAttribution": false,
@@ -290,8 +265,8 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        1744,
-        -1072
+        1984,
+        -1232
       ],
       "id": "c5c16def-7436-4ecb-9ca5-ecaf7f382895",
       "name": "Already Logged In",
@@ -331,7 +306,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        1552,
+        1760,
         480
       ],
       "id": "560dd8c1-82a1-464c-aa6b-a30273e235f2",
@@ -339,7 +314,7 @@
     },
     {
       "parameters": {
-        "chatId": "={{ $('Message').first().json.message.chat.id }}",
+        "chatId": "={{ $('fromId').first().json.fromId }}",
         "text": "=❌ Incorrect password, try again",
         "additionalFields": {
           "appendAttribution": false,
@@ -349,7 +324,7 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        1984,
+        2192,
         576
       ],
       "id": "86e48344-2aa3-4424-aeb2-a107045c9378",
@@ -386,7 +361,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1776,
+        1984,
         416
       ],
       "id": "49cb0690-0fe9-40b7-804e-4a0f4077dc8b",
@@ -407,8 +382,8 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        1296,
-        368
+        1488,
+        352
       ],
       "typeVersion": 1,
       "id": "98fc5bd5-ebd2-4ce0-abd9-dd0c002bc598",
@@ -442,7 +417,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        1040,
+        1248,
         80
       ],
       "id": "9da3b15b-78bb-410a-990b-91eb3da5dd9e",
@@ -450,7 +425,7 @@
     },
     {
       "parameters": {
-        "chatId": "={{ $('Message').first().json.message.chat.id }}",
+        "chatId": "={{ $('fromId').first().json.fromId }}",
         "text": "=✅ You are now authorized to manage stop list of <b>\"{{ $('Get Project By Password').item.json.name }}\"</b>\n\n💡 Accepted formats:\n  • https://www.instagram.com/username  \n  • @username  \n  • username",
         "additionalFields": {
           "appendAttribution": false,
@@ -460,7 +435,7 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        1984,
+        2192,
         416
       ],
       "id": "3f4577ad-e551-46be-b632-6e090de48311",
@@ -492,7 +467,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1344,
+        1552,
         480
       ],
       "id": "e539098b-2fc0-44c9-84ac-3035055c2b4b",
@@ -524,7 +499,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1344,
+        1552,
         -32
       ],
       "id": "1f4e08d2-089a-4d08-a196-0eead342f698",
@@ -565,7 +540,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        1952,
+        2160,
         -32
       ],
       "id": "31b86534-7a6c-4b65-88c3-a7c8dfd5d574",
@@ -573,7 +548,7 @@
     },
     {
       "parameters": {
-        "chatId": "={{ $('Message').first().json.message.chat.id }}",
+        "chatId": "={{ $('fromId').first().json.fromId }}",
         "text": "=❌ Invalid username provided, try again",
         "additionalFields": {
           "appendAttribution": false,
@@ -583,7 +558,7 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        2176,
+        2384,
         144
       ],
       "id": "2ac0275e-6e56-49d7-8384-4454f3f2cce9",
@@ -610,8 +585,8 @@
       "type": "n8n-nodes-base.executionData",
       "typeVersion": 1.1,
       "position": [
-        1248,
-        -960
+        1024,
+        -1120
       ],
       "id": "45c586ee-b602-4194-aa26-0edd5daca7eb",
       "name": "[LOG] Input Type Button"
@@ -630,7 +605,7 @@
       "type": "n8n-nodes-base.executionData",
       "typeVersion": 1.1,
       "position": [
-        816,
+        1024,
         80
       ],
       "id": "c50e53dd-123a-466d-b74b-4b42932f8983",
@@ -650,7 +625,7 @@
       "type": "n8n-nodes-base.executionData",
       "typeVersion": 1.1,
       "position": [
-        2160,
+        2368,
         416
       ],
       "id": "644052a7-c16f-49b7-ac10-43ecfad7c1b8",
@@ -670,7 +645,7 @@
       "type": "n8n-nodes-base.executionData",
       "typeVersion": 1.1,
       "position": [
-        1552,
+        1760,
         -32
       ],
       "id": "f333a393-d494-4545-9193-993204862197",
@@ -700,7 +675,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2176,
+        2384,
         -144
       ],
       "id": "6846a6ae-e5d4-4d01-97e6-23cc8e0cc184",
@@ -728,7 +703,7 @@
       "type": "n8n-nodes-base.executionData",
       "typeVersion": 1.1,
       "position": [
-        2432,
+        2640,
         144
       ],
       "id": "7a510bb1-1999-4628-a6b7-0b49034ea164",
@@ -737,14 +712,14 @@
     {
       "parameters": {
         "content": "## Buttons",
-        "height": 400,
+        "height": 176,
         "width": 752,
         "color": 3
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        1184,
-        -1120
+        1136,
+        -1712
       ],
       "typeVersion": 1,
       "id": "78a1b119-a77e-4f69-bb7c-e6e07d742690",
@@ -757,7 +732,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1760,
+        1968,
         -32
       ],
       "id": "b48a1483-5594-46a4-86f2-48f7e3ab9611",
@@ -773,7 +748,7 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        1296,
+        1488,
         -384
       ],
       "typeVersion": 1,
@@ -782,7 +757,7 @@
     },
     {
       "parameters": {
-        "chatId": "={{ $('Message').first().json.message.chat.id }}",
+        "chatId": "={{ $('fromId').first().json.fromId }}",
         "text": "=⚠️ Unsupported message, only text messages are supported",
         "additionalFields": {
           "appendAttribution": false,
@@ -792,7 +767,7 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        816,
+        1024,
         -160
       ],
       "id": "a891dc9b-1556-46d9-a77d-316f12a21d38",
@@ -819,7 +794,7 @@
       "type": "n8n-nodes-base.executionData",
       "typeVersion": 1.1,
       "position": [
-        1040,
+        1248,
         -160
       ],
       "id": "1bf8143e-1689-4093-af71-28996453754e",
@@ -839,7 +814,7 @@
       "type": "n8n-nodes-base.executionData",
       "typeVersion": 1.1,
       "position": [
-        2640,
+        2848,
         -368
       ],
       "id": "2f5757ae-5403-419e-9418-a2d3c9027e6d",
@@ -859,7 +834,7 @@
       "type": "n8n-nodes-base.executionData",
       "typeVersion": 1.1,
       "position": [
-        2640,
+        2848,
         0
       ],
       "id": "ef2a4d59-2397-4f4a-a4c2-70eaf8ce78b3",
@@ -867,7 +842,7 @@
     },
     {
       "parameters": {
-        "chatId": "={{ $('Message').first().json.message.chat.id }}",
+        "chatId": "={{ $('fromId').first().json.fromId }}",
         "text": "=✅ Added to stop list:\n@{{ $json.client_username }}",
         "additionalFields": {
           "appendAttribution": false,
@@ -877,7 +852,7 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        2848,
+        3056,
         -368
       ],
       "id": "e91f0e2f-f763-4651-aeab-7a85a2ad36f2",
@@ -892,7 +867,7 @@
     },
     {
       "parameters": {
-        "chatId": "={{ $('Message').first().json.message.chat.id }}",
+        "chatId": "={{ $('fromId').first().json.fromId }}",
         "text": "=❗ Internal error has occured, try again",
         "additionalFields": {
           "appendAttribution": false,
@@ -902,7 +877,7 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        2848,
+        3056,
         0
       ],
       "id": "2d983e1c-d0a7-4bc2-9dd7-2ebeb1c81a6e",
@@ -957,7 +932,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        2384,
+        2592,
         -240
       ],
       "id": "8781192e-5180-4d79-a104-87f96ee675b1",
@@ -977,8 +952,8 @@
       "type": "n8n-nodes-base.executionData",
       "typeVersion": 1.1,
       "position": [
-        2640,
-        -192
+        3632,
+        -176
       ],
       "id": "e939f5ab-d624-4248-bd8b-b9b0f1229ff1",
       "name": "[LOG] Event STOP USER NOT FOUND"
@@ -995,8 +970,8 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        2848,
-        -192
+        3840,
+        -176
       ],
       "id": "d5286f77-c80b-4fb8-a0de-5e3b22bdbf0c",
       "name": "User Not Found",
@@ -1032,8 +1007,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2160,
-        -384
+        2144,
+        -352
       ],
       "id": "058b5a8c-4bd8-48ff-9054-2f94bd61b91a",
       "name": "Add To Stop List1",
@@ -1058,7 +1033,7 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        192,
+        400,
         32
       ],
       "id": "85865369-4f55-4ede-92db-5c35ca6ce9bb",
@@ -1100,7 +1075,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        192,
+        400,
         -144
       ],
       "id": "7e4418d0-fea7-4605-9522-92629a2cd296",
@@ -1116,12 +1091,228 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        80,
-        -208
+        288,
+        -192
       ],
       "typeVersion": 1,
       "id": "e19b3a22-b719-4927-b362-ca4fad196495",
       "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Message').first().json.message.text }}",
+                    "rightValue": "/start",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "fe5ea722-100b-4e1d-b1a0-fe20c63d9f31"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "/start"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "34499ec1-87b9-43d3-b86c-ad2f3a659ea9",
+                    "leftValue": "={{ $('Message').first().json.message.text }}",
+                    "rightValue": "/menu",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "/menu"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        1792,
+        -1136
+      ],
+      "id": "8136c50d-9068-41e9-8c3f-39378c1dcb57",
+      "name": "Button"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('fromId').first().json.fromId }}",
+        "text": "=Please enter password",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1232,
+        -976
+      ],
+      "id": "6fa57063-7156-4f8b-a937-7b394ed4adfb",
+      "name": "Ask Password",
+      "webhookId": "8f24d875-0c53-4705-8100-e798f5ee1b6c",
+      "credentials": {
+        "telegramApi": {
+          "id": "RjFhbLnDMoH8VW2V",
+          "name": "AI Manager Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://fmvzsfizkiimeavbdton.supabase.co/rest/v1/MANAGER_projects",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "id",
+              "value": "=eq.{{ $('Get User').first().json.project_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1440,
+        -784
+      ],
+      "id": "c553cb13-a5ae-42d3-b38e-c28dd122478f",
+      "name": "Get Project1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "woWs2SoFYkGNkCXD",
+          "name": "ClientRecords Supabase Auth Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "project",
+              "value": "={{ $json.name }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        1616,
+        -784
+      ],
+      "id": "bce6bed9-7cf6-45dd-813f-28b45f39065a",
+      "name": "[LOG] Project Name1"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('fromId').first().json.fromId }}",
+        "text": "Choose Option:",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "▶️ Start AI",
+                    "additionalFields": {
+                      "callback_data": "start_workflow"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "⏹️ Stop AI",
+                    "additionalFields": {
+                      "callback_data": "stop_workflow"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1984,
+        -1072
+      ],
+      "id": "b6168ff0-b57e-4c94-8eba-70d015da8f2d",
+      "name": "Menu",
+      "webhookId": "bc7a9d32-6968-4674-b299-5c1790904683",
+      "credentials": {
+        "telegramApi": {
+          "id": "RjFhbLnDMoH8VW2V",
+          "name": "AI Manager Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "input_type",
+              "value": "callback"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        1024,
+        -688
+      ],
+      "id": "af0e28df-1f28-4695-87eb-bab575af83e1",
+      "name": "[LOG] Input Type Callback"
     },
     {
       "parameters": {
@@ -1151,20 +1342,354 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        1472,
-        -960
+        1232,
+        -1120
       ],
-      "id": "2eed25e4-0025-4ad6-8eaa-1a9b72e3d3e6",
+      "id": "7540705e-d887-46cc-a82e-af06a9de3317",
       "name": "User Already Created1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "39ac583c-49d3-4709-9e18-e441e2b4a9ad",
+              "leftValue": "={{ $('User Data').first().json.user_exists }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1232,
+        -688
+      ],
+      "id": "11a2efad-6db4-42da-9a31-ac6cb25a9171",
+      "name": "User Already Created2"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('fromId').first().json.fromId }}",
+        "text": "=Please enter password",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1232,
+        -544
+      ],
+      "id": "53478618-2d66-42fd-9616-fc564896427b",
+      "name": "Ask Password1",
+      "webhookId": "8f24d875-0c53-4705-8100-e798f5ee1b6c",
+      "credentials": {
+        "telegramApi": {
+          "id": "RjFhbLnDMoH8VW2V",
+          "name": "AI Manager Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Message').first().json.callback_query.data }}",
+                    "rightValue": "start_workflow",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "fc623da3-a88f-4501-842a-b6fb85a060e9"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "start_workflow"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "08269a99-ce22-4122-9cc2-743f0b7ba591",
+                    "leftValue": "={{ $('Message').first().json.callback_query.data }}",
+                    "rightValue": "stop_workflow",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "=stop_workflow"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c0cfff37-56a6-4849-8a8b-8df72f81676e",
+                    "leftValue": "unknown",
+                    "rightValue": "unknown",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "unknown"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        1792,
+        -800
+      ],
+      "id": "15250509-a157-4db6-a24f-d176470a6e2f",
+      "name": "Callback"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('fromId').first().json.fromId }}",
+        "text": "=Unknown Callback",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1792,
+        -624
+      ],
+      "id": "b2913cfb-9568-40ce-b01e-efac60ec95d0",
+      "name": "Unknown Callback",
+      "webhookId": "8f24d875-0c53-4705-8100-e798f5ee1b6c",
+      "credentials": {
+        "telegramApi": {
+          "id": "RjFhbLnDMoH8VW2V",
+          "name": "AI Manager Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9075cfea-79e0-4b72-8b53-7686d994b1ad",
+              "name": "fromId",
+              "value": "={{ \n$('Message').first().json.message \n  ? $('Message').first().json.message.chat.id\n  : $('Message').first().json.callback_query.from.id\n}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -288,
+        -144
+      ],
+      "id": "86c40d2e-623e-41ff-ab01-f9cd9e8d3f28",
+      "name": "fromId"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://n8n.orbitalgarden.space/api/v1/workflows/{{$json.workflow_id}}/deactivate",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-N8N-API-KEY",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkM2UxODI0OC0zYmFjLTRjMDgtYWU0Ny1lOTc4ZjZiZTdiNDMiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzY0NDg2ODAwfQ.XGuNSXnQBC_ACguwdm0KW0-UjVFJAdZbz-PAnlbxpsI"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2144,
+        -688
+      ],
+      "id": "5cb77049-30a4-438a-a5f3-93ed2cea9464",
+      "name": "Stop Workflow"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://n8n.orbitalgarden.space/api/v1/workflows/{{$json.workflow_id}}/activate",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-N8N-API-KEY",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkM2UxODI0OC0zYmFjLTRjMDgtYWU0Ny1lOTc4ZjZiZTdiNDMiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzY0NDg2ODAwfQ.XGuNSXnQBC_ACguwdm0KW0-UjVFJAdZbz-PAnlbxpsI"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2144,
+        -880
+      ],
+      "id": "3d729a96-9de9-4c29-ae59-a82ed821acee",
+      "name": "Start Workflow"
+    },
+    {
+      "parameters": {
+        "resource": "callback",
+        "queryId": "={{ $('Message').item.json.callback_query.id }}",
+        "additionalFields": {
+          "text": "✅ Started AI Agent"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2416,
+        -880
+      ],
+      "id": "a6d37793-1ed8-44f8-9f51-d2c04c940481",
+      "name": "Workflow Started",
+      "webhookId": "8f24d875-0c53-4705-8100-e798f5ee1b6c",
+      "credentials": {
+        "telegramApi": {
+          "id": "RjFhbLnDMoH8VW2V",
+          "name": "AI Manager Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "callback",
+        "queryId": "={{ $('Message').item.json.callback_query.id }}",
+        "additionalFields": {
+          "text": "✅ Stopped AI Agent"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2416,
+        -688
+      ],
+      "id": "85cacc2d-98b0-4bf4-812d-3035f0ccfdb3",
+      "name": "Workflow Stopped",
+      "webhookId": "8f24d875-0c53-4705-8100-e798f5ee1b6c",
+      "credentials": {
+        "telegramApi": {
+          "id": "RjFhbLnDMoH8VW2V",
+          "name": "AI Manager Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "event",
+              "value": "SUCC_WORKFLOW_STOPPED"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        2688,
+        -688
+      ],
+      "id": "45da73ea-a7a7-439c-85e4-39d71789602a",
+      "name": "[LOG] Event SUCC WORKFLOW STOPPED"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "event",
+              "value": "SUCC_WORKFLOW_STARTED"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        2688,
+        -880
+      ],
+      "id": "81602458-1cf8-418f-8f1b-9305d9cd9b44",
+      "name": "[LOG] Event SUCC WORKFLOW STARTED"
     }
   ],
   "pinData": {
     "Message": [
       {
         "json": {
-          "update_id": 641698656,
-          "message": {
-            "message_id": 41,
+          "update_id": 641698735,
+          "callback_query": {
+            "id": "2163697242397333643",
             "from": {
               "id": 503775021,
               "is_bot": false,
@@ -1172,14 +1697,39 @@
               "username": "pplpls",
               "language_code": "en"
             },
-            "chat": {
-              "id": 503775021,
-              "first_name": "Максим",
-              "username": "pplpls",
-              "type": "private"
+            "message": {
+              "message_id": 198,
+              "from": {
+                "id": 8392470679,
+                "is_bot": true,
+                "first_name": "AI Manager Bot",
+                "username": "orbital_garden_manager_bot"
+              },
+              "chat": {
+                "id": 503775021,
+                "first_name": "Максим",
+                "username": "pplpls",
+                "type": "private"
+              },
+              "date": 1764490789,
+              "text": "Choose Option:",
+              "reply_markup": {
+                "inline_keyboard": [
+                  [
+                    {
+                      "text": "▶️ Start AI",
+                      "callback_data": "start_workflow"
+                    },
+                    {
+                      "text": "⏹️ Stop AI",
+                      "callback_data": "stop_workflow"
+                    }
+                  ]
+                ]
+              }
             },
-            "date": 1762709279,
-            "text": "maqs.oh"
+            "chat_instance": "4708971289150799450",
+            "data": "stop_workflow"
           }
         }
       }
@@ -1204,7 +1754,7 @@
         ],
         [
           {
-            "node": "Unsupported Type",
+            "node": "[LOG] Input Type Callback",
             "type": "main",
             "index": 0
           }
@@ -1258,7 +1808,7 @@
       "main": [
         [
           {
-            "node": "Get User",
+            "node": "fromId",
             "type": "main",
             "index": 0
           }
@@ -1510,11 +2060,40 @@
         ]
       ]
     },
-    "User Already Created1": {
+    "Button": {
       "main": [
         [
           {
             "node": "Already Logged In",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Menu",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Project1": {
+      "main": [
+        [
+          {
+            "node": "[LOG] Project Name1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "User Already Created1": {
+      "main": [
+        [
+          {
+            "node": "Button",
             "type": "main",
             "index": 0
           }
@@ -1527,13 +2106,133 @@
           }
         ]
       ]
+    },
+    "[LOG] Input Type Callback": {
+      "main": [
+        [
+          {
+            "node": "User Already Created2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "User Already Created2": {
+      "main": [
+        [
+          {
+            "node": "Get Project1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ask Password1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "[LOG] Project Name1": {
+      "main": [
+        [
+          {
+            "node": "Callback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Callback": {
+      "main": [
+        [
+          {
+            "node": "Start Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unknown Callback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "fromId": {
+      "main": [
+        [
+          {
+            "node": "Get User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Workflow": {
+      "main": [
+        [
+          {
+            "node": "Workflow Started",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Stop Workflow": {
+      "main": [
+        [
+          {
+            "node": "Workflow Stopped",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Workflow Stopped": {
+      "main": [
+        [
+          {
+            "node": "[LOG] Event SUCC WORKFLOW STOPPED",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Workflow Started": {
+      "main": [
+        [
+          {
+            "node": "[LOG] Event SUCC WORKFLOW STARTED",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "5dfdda44-2a43-43e4-956c-d85c375d85ae",
+  "versionId": "0c2a5e56-f610-4905-88aa-290fc7323096",
   "meta": {
     "instanceId": "c9e53a150db3979558dce85b88732650eafd440e09b4690afc30683da1136ad9"
   },
