@@ -2,3 +2,10 @@
 https://www.notion.so/edenspace/NEw-day-new-headache-2b723b3c46e2800b85afee28cd8d09f5
 
 ---
+
+[kristina_dubai: previous reworked prompt was fucking shit (see notes)]
+Actually it wasn't that bad, had just one big issue - very often used incorrect languages.
+And upon inspection ChatGPT detected many contradictions, in other words it considered my prompt FUCKING SHIT.
+
+---
+
