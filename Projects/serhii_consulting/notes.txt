@@ -1,0 +1,7 @@
+[serhii_consulting: fix incorrect recognition of auto-message reply]
+So the problem was that sometimes, when the user is asked about approaches used to get clients, he doesn't directly reply "Таргет/Сарафан" or anything related at all. 
+So I made the recognition rule more broad to minimize the risk of this miss. 
+P.S. it is better to mistakenly assume the business is already known, then to re-ask about business and look stupid
+
+---
+
