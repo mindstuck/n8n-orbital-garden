@@ -54,7 +54,7 @@ Message:
 Logic:
 If “Agent” → state.user_role = Agent → go to STEP 3
 If “Self” → state.user_role = Self → go to STEP 2
-If unclear/non-answer → go to STEP 7
+If unclear/non-answer → go to STEP 7, do not re-ask the question.
 This is always the first question.
 
 STEP 2 - Building familiarity (Self only)
