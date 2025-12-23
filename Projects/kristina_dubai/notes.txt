@@ -9,3 +9,8 @@ And upon inspection ChatGPT detected many contradictions, in other words it cons
 
 ---
 
+[krsitina_dubai: fix language & repeated question]
+It's been 100 time when this shit breaks. 
+I disabled all off_topic redirects, including 1st message. And added more rules to enforce same lanuage policy  
+
+---
